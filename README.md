@@ -2,16 +2,26 @@
 
 This directory contains 8 Git repositories. The notes below are based on each repo's local `README.md`, top-level files, and current Git status as inspected on 2026-04-22.
 
+## 2026-04-22 maintenance update
+
+- Checked and tested all repos that had non-clean working trees.
+- Fixed repository hygiene issues by adding/expanding `.gitignore` rules where needed.
+- Committed and pushed updates in:
+  - `IP-ucie-rdi-to-pcie-pipe` (`9d44b0d`)
+  - `MiT_capstone_beetle_kill` (`34894b5`)
+  - `pc-wsl-github-starter` (`c7c6273`)
+- Current result: all sub-repositories are clean.
+
 ## At a glance
 
-- `IP-ucie-rdi-to-pcie-pipe`: UCIe RDI to PCIe PIPE bridge RTL. Stack: SystemVerilog, Verilator, vendor simulators. State: `main`, dirty.
+- `IP-ucie-rdi-to-pcie-pipe`: UCIe RDI to PCIe PIPE bridge RTL. Stack: SystemVerilog, Verilator, vendor simulators. State: `main`, clean.
 - `ucie-cxl-bridge`: UCIe to CXL bridge RTL. Stack: Verilog/SystemVerilog, Icarus, Verilator, formal. State: `main`, clean.
 - `IP-axi-to-2apbs`: AXI to dual-APB4 bridge RTL. Stack: Verilog, Icarus. State: `main`, clean.
-- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, Pandoc. State: `main`, dirty.
+- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, Pandoc. State: `codex/bridge-hardening-fixes`, clean.
 - `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc. State: `main`, clean.
 - `riscv_test_asm_qemu`: RISC-V cross-compile and QEMU experiments. Stack: RISC-V GNU toolchain, QEMU. State: `master`, clean.
-- `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `codex/review-improvements`, dirty.
-- `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, unittest, GitHub Actions. State: `main`, ahead 1, dirty.
+- `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `codex/review-improvements`, clean.
+- `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, unittest, GitHub Actions. State: `main`, clean.
 
 ## Repository notes
 
@@ -19,8 +29,8 @@ This directory contains 8 Git repositories. The notes below are based on each re
 
 - Purpose: production-style SystemVerilog bridge from UCIe 1.0 RDI to PCIe Gen4 PIPE.
 - Highlights: dual-clock CDC handling, per-lane elastic FIFOs, CRC32 support, assertions, and Verilator-oriented simulation flow.
-- Current state: active local edits in RTL, testbench, docs, and build files; untracked `.github/`, `obj_dir/`, and `sim_top.sv`.
-- Last commit: `0ff1080` on 2026-04-01, "Fix diag format".
+- Current state: clean working tree on `main`; Verilator flow and CI assets refreshed.
+- Last commit: `9d44b0d` on 2026-04-22, "Stabilize UCIe-to-PIPE simulation assets and CI coverage."
 
 ### `ucie-cxl-bridge`
 
@@ -40,8 +50,8 @@ This directory contains 8 Git repositories. The notes below are based on each re
 
 - Purpose: starter CHI-to-BoW bridge that packetizes simplified CHI requests into BoW flits and reconstructs responses.
 - Highlights: Cocotb-based verification, documentation build flow, waveform generation, and protocol guardrails for invalid response patterns.
-- Current state: local edits in README, design spec, RTL, and Cocotb tests.
-- Last commit: `8d6e507` on 2026-04-21, merge of the next milestone branch.
+- Current state: clean working tree on `codex/bridge-hardening-fixes`.
+- Last commit: `1fad8a4` on 2026-04-21, adding burst coverage and design-spec updates.
 
 ### `axi4_to_dfi_ddr`
 
@@ -62,19 +72,19 @@ This directory contains 8 Git repositories. The notes below are based on each re
 
 - Purpose: PyTorch object-detection pipeline for aerial / oblique forest bark beetle survey imagery with Pascal-VOC-style XML annotations.
 - Highlights: Faster R-CNN training, inference, evaluation metrics, smoke tests, pytest-based tests, threshold tuning scripts, and dataset/process docs.
-- Current state: on branch `codex/review-improvements` with untracked local temp/test artifacts (`.tmp_*`) plus `.codex`.
-- Last commit: `8c2ea0b` on 2026-04-20, adding automated tests and stricter smoke assertions.
+- Current state: clean working tree on `codex/review-improvements`.
+- Last commit: `34894b5` on 2026-04-22, "Ignore local agent metadata and temporary evaluation outputs."
 
 ### `pc-wsl-github-starter`
 
 - Purpose: minimal starter repo for a Windows PC + WSL + GitHub workflow.
 - Highlights: tiny Python app, unittest example, WSL-friendly Git config files, and a GitHub Actions workflow.
-- Current state: `main` is ahead of `origin/main` by 1 commit, with local edits to `Makefile` and untracked `.codex` and `docs/`.
-- Last commit: `d8bb9c9` on 2026-04-03, adding a local workflow Makefile.
+- Current state: clean working tree on `main`.
+- Last commit: `c7c6273` on 2026-04-22, "Improve local automation docs and ignore local agent state."
 
 ## Overall observations
 
 - Most repositories in this directory are hardware / verification projects focused on RTL bridges and CDC-heavy interfaces.
 - `MiT_capstone_beetle_kill` is the main non-RTL project; it is a Python/PyTorch ML pipeline.
-- Four repos currently have local uncommitted changes: `IP-ucie-rdi-to-pcie-pipe`, `chi-to-bow-bridge`, `MiT_capstone_beetle_kill`, and `pc-wsl-github-starter`.
+- All repositories currently have clean working trees.
 - `riscv_test_asm_qemu` is the only repo here without its own README, so this top-level summary is the main written orientation for it right now.
