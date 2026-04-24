@@ -7,7 +7,7 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 - Surveyed and tested all 9 sub-repos.
 - Fixed Verilator lint warnings (width mismatches, unused signal) in `IP-ucie-rdi-to-pcie-pipe` RTL.
 - Fixed `make verilator` CI failure in `IP-ucie-rdi-to-pcie-pipe` (Makefile now uses root `.sv` files directly rather than `src/`/`test/` include-wrappers that Verilator could not resolve).
-- Added typed 64-bit packet model (CXL.io ↔ UCIe translation, checksum, error packets) to `ucie-cxl-bridge`.
+- Added typed 64-bit packet model (CXL.io <-> UCIe translation, checksum, error packets) to `ucie-cxl-bridge`.
 - Updated documentation across all repos: filled in `ucie-cxl-bridge` Architecture section, expanded `riscv_test_asm_qemu` README to cover all 10 ISA tests, corrected `IP-ucie-rdi-to-pcie-pipe` project structure description.
 - All 9 sub-repos are clean on their respective branches.
 
