@@ -21,7 +21,7 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 - `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, unittest, GitHub Actions. State: `main`, clean.
 - `riscv_test_asm_qemu`: RISC-V cross-compile and QEMU experiments. Stack: RISC-V GNU toolchain, QEMU. State: `master`, clean.
 - `snn-crossbar-model`: Spiking neural network crossbar model. Stack: Python, PyTorch, C++, SystemC, Verilog, pytest. State: `main`, clean.
-- `ucie-cxl-bridge`: UCIe to CXL bridge RTL. Stack: Verilog/SystemVerilog, Icarus, Verilator, formal. State: `main`, clean.
+- `ucie-cxl-bridge`: UCIe to CXL bridge RTL (Phases 1–3). Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys. State: `main`, clean.
 
 ## Repository notes
 
@@ -85,9 +85,9 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 ### `ucie-cxl-bridge`
 
 - Purpose: experimental UCIe Adapter Layer to CXL.io / CXL.cache / CXL.mem bridge.
-- Highlights: Phase 1 typed-packet model with 64-bit packet definitions (`cxl_ucie_bridge_defs.vh`), CXL.io request → UCIe adapter request translation, UCIe completion → CXL.io completion translation, XOR checksum generation and verification, explicit error/invalid packet output for unsupported kinds, bounded formal (BMC + cover) on `sync_fifo`, Verilator lint, and Windows PowerShell sim helper.
+- Highlights: three completed phases — Phase 1 typed 64-bit packet model and CXL.io ↔ UCIe translation; Phase 2 full packet taxonomy (CXL.io / CXL.mem / CXL.cache requests and AD_CPL / MEM_CPL / CACHE_CPL completions) with XOR checksum and GTKWave save file; Phase 3 per-direction credit counters (`credit_counter.v`), posted/non-posted ordering domain split with posted-priority egress arbiter and registered arbiter lock for valid/ready stability, ordering directed test, and SymbiYosys BMC + cover on both `sync_fifo` and `cxl_ucie_bridge`. Verilator lint clean, Windows PowerShell sim helper included.
 - Current state: clean working tree on `main`.
-- Last commit: `79f2a63` — "docs: fill in Architecture section with typed-packet model description."
+- Last commit: `0a29816` — "Phase 3: flow control, ordering split, and arbiter stability fix."
 
 ## Overall observations
 
