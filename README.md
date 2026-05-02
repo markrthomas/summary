@@ -11,17 +11,17 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 - `riscv_test_asm_qemu`: reorganized into `src/asm`, `src/cpp`, `docs/`, and `build/` layout.
 - `snn-crossbar-model`: added visualization tool (`scripts/visualize.py`), addressed P0/P1/P2 review issues, and added development roadmap.
 - `ucie-cxl-bridge`: updated design-spec for Phase 3 (credit/ordering, arbiter lock).
-- `IP-axi-to-2apbs`: new commit documenting bridge design contract; **dirty working tree** (14 uncommitted changes — root-level RTL/TB files staged for deletion, src/test versions modified, 2 new test files untracked).
-- `pc-wsl-github-starter`: **dirty working tree** (9 uncommitted changes — enhanced Python app, tests, CI workflow, and new pyproject.toml/requirements-dev.txt).
+- `IP-axi-to-2apbs`: new commit documenting bridge design contract; follow-up commit wires Makefile to src/test layout and adds extended/parameterized burst TBs.
+- `pc-wsl-github-starter`: upgraded to Typer/Rich CLI, pytest, ruff/mypy, and venv-backed Makefile.
 
 ## At a glance
 
-- `IP-axi-to-2apbs`: AXI to dual-APB4 bridge RTL. Stack: Verilog, Icarus. State: `main`, **dirty** (14 uncommitted changes).
+- `IP-axi-to-2apbs`: AXI to dual-APB4 bridge RTL. Stack: Verilog, Icarus. State: `main`, clean.
 - `IP-ucie-rdi-to-pcie-pipe`: UCIe RDI to PCIe PIPE bridge RTL. Stack: SystemVerilog, Verilator, vendor simulators. State: `main`, clean.
 - `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `codex/review-improvements`, clean.
 - `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc. State: `main`, clean.
 - `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, Pandoc. State: `integration-bow-inject-mux`, clean.
-- `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, unittest, GitHub Actions. State: `main`, **dirty** (9 uncommitted changes).
+- `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, Typer, pytest, GitHub Actions. State: `main`, clean.
 - `riscv_test_asm_qemu`: RISC-V cross-compile and QEMU experiments. Stack: RISC-V GNU toolchain, QEMU. State: `master`, clean.
 - `snn-crossbar-model`: Spiking neural network crossbar model. Stack: Python, PyTorch, C++, SystemC, Verilog, pytest. State: `main`, clean.
 - `ucie-cxl-bridge`: UCIe to CXL bridge RTL (Phases 1–3). Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys. State: `main`, clean.
@@ -32,8 +32,8 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 
 - Purpose: AXI to 2× APB4 bridge RTL with self-checking testbenches.
 - Highlights: separate simple and burst bridge variants, APB read wait-state test sweeps (`make test-simple-ws-sweep`), and bridge design contract documented in `doc/design_contract.md`.
-- Current state: **dirty working tree** on `main` — root-level RTL/TB files deleted (moving to `src/`/`test/`), corresponding `src/` and `test/` files modified, and two new test files (`tb_axi4_to_apb4_2x_burst_extended.v`, `tb_parameterized_config.v`) untracked.
-- Last commit: `494d1b5` — "Document bridge design contract."
+- Current state: clean working tree on `main`.
+- Last commit: `6e5f398` — "Wire Makefile to src/test layout and add extended/parameterized TBs."
 
 ### `IP-ucie-rdi-to-pcie-pipe`
 
@@ -68,8 +68,8 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 
 - Purpose: minimal starter repo for a Windows PC + WSL + GitHub workflow.
 - Highlights: tiny Python app, unittest example, WSL-friendly Git config files, local `make` workflow, and a GitHub Actions CI.
-- Current state: **dirty working tree** on `main` — 5 modified tracked files (app, tests, CI workflow, Makefile, README) and 4 new untracked files (`pyproject.toml`, `requirements-dev.txt`, `src/__init__.py`, `tests/__init__.py`).
-- Last commit: `c7c6273` — "Improve local automation docs and ignore local agent state."
+- Current state: clean working tree on `main`.
+- Last commit: `5283f74` — "Upgrade to Typer/Rich CLI, pytest, ruff/mypy, and venv Makefile."
 
 ### `riscv_test_asm_qemu`
 
@@ -97,4 +97,4 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 - Eight of the nine repositories are hardware / verification projects (RTL bridges, CDC, memory controllers, a protocol bridge, and a spiking neural network with RTL cross-check).
 - `MiT_capstone_beetle_kill` is the sole ML/Python project.
 - `chi-to-bow-bridge` and `MiT_capstone_beetle_kill` are on active feature branches (`integration-bow-inject-mux` and `codex/review-improvements` respectively); all other repos are on `main` / `master`.
-- `IP-axi-to-2apbs` and `pc-wsl-github-starter` have dirty working trees with uncommitted changes.
+- All 9 repositories currently have clean working trees.
