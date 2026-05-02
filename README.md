@@ -18,9 +18,9 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 
 - `IP-axi-to-2apbs`: AXI to dual-APB4 bridge RTL. Stack: Verilog, Icarus. State: `main`, clean.
 - `IP-ucie-rdi-to-pcie-pipe`: UCIe RDI to PCIe PIPE bridge RTL. Stack: SystemVerilog, Verilator, vendor simulators. State: `main`, clean.
-- `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `codex/review-improvements`, clean.
+- `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `main`, clean.
 - `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc. State: `main`, clean.
-- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, Pandoc. State: `integration-bow-inject-mux`, clean.
+- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, Pandoc. State: `main`, clean.
 - `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, Typer, pytest, GitHub Actions. State: `main`, clean.
 - `riscv_test_asm_qemu`: RISC-V cross-compile and QEMU experiments. Stack: RISC-V GNU toolchain, QEMU. State: `master`, clean.
 - `snn-crossbar-model`: Spiking neural network crossbar model. Stack: Python, PyTorch, C++, SystemC, Verilog, pytest. State: `main`, clean.
@@ -47,8 +47,8 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 
 - Purpose: PyTorch object-detection pipeline for aerial / oblique forest bark beetle survey imagery with Pascal-VOC-style XML annotations.
 - Highlights: Faster R-CNN (ResNet50-FPN) training and inference, per-class precision/recall/F1 evaluation, CPU and GPU smoke tests, pytest suite, confidence-threshold tuning script, and dataset/process docs.
-- Current state: clean working tree on `codex/review-improvements`; branch is ahead of `main` with automated test workflow and smoke assertion hardening.
-- Last commit: `34894b5` — "Ignore local agent metadata and temporary evaluation outputs."
+- Current state: clean working tree on `main`; PR #1 merged — automated test workflow, smoke assertion hardening, and agent metadata cleanup now on main.
+- Last commit: `f44c5fa` — "Merge pull request #1: Improve detector robustness, test workflow, and agent metadata cleanup."
 
 ### `axi4_to_dfi_ddr`
 
@@ -61,8 +61,8 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 
 - Purpose: starter CHI-to-BoW bridge that packetizes simplified CHI requests into BoW flits and reconstructs responses.
 - Highlights: multiple outstanding transactions keyed by `txnid`, burst read/write support, out-of-order completion, error counters for malformed RX traffic, Cocotb verification, integration top with reference BFM, OSS Verilator structural coverage CI job, optional UVM bench (`uvm_bench/`), BoW RX inject mux with parity tests, and PDF doc build.
-- Current state: clean working tree on `integration-bow-inject-mux`.
-- Last commit: `312d842` — "Add BoW RX inject mux on integration top + parity tests."
+- Current state: clean working tree on `main`; PR #9 merged — BoW RX inject mux, parity tests, OSS Verilator coverage, and UVM bench now on main.
+- Last commit: `d9363cc` — "Merge pull request #9: Integration top: BoW RX inject mux + unknown txn RSP_HDR parity."
 
 ### `pc-wsl-github-starter`
 
@@ -96,5 +96,5 @@ This directory contains 9 Git repositories. The notes below reflect each repo's 
 
 - Eight of the nine repositories are hardware / verification projects (RTL bridges, CDC, memory controllers, a protocol bridge, and a spiking neural network with RTL cross-check).
 - `MiT_capstone_beetle_kill` is the sole ML/Python project.
-- `chi-to-bow-bridge` and `MiT_capstone_beetle_kill` are on active feature branches (`integration-bow-inject-mux` and `codex/review-improvements` respectively); all other repos are on `main` / `master`.
+- All 9 repositories are on `main` / `master`; feature branches merged during this sweep.
 - All 9 repositories currently have clean working trees.
