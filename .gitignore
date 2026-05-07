@@ -4,4 +4,5 @@
 !README.pdf
 !Makefile
 !.pandoc-header.tex
+!.pandoc-pdf-defaults.yaml
 !.report-title.md

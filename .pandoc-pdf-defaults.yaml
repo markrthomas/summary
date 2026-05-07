@@ -1,0 +1,23 @@
+# Workspace summary PDF — matches chi-to-bow-bridge Pandoc stack (XeLaTeX + DejaVu).
+# Makefile passes -H .pandoc-header.tex for report chrome (fancyhdr).
+from: markdown
+to: pdf
+standalone: true
+pdf-engine: xelatex
+variables:
+  documentclass: article
+  fontsize: 10pt
+  papersize: letter
+  geometry: margin=2cm
+  colorlinks: true
+  linkcolor: blue
+  urlcolor: blue
+  toc: true
+  toc-depth: 3
+  secnumdepth: 3
+  linestretch: 1.08
+  mainfont: DejaVu Serif
+  sansfont: DejaVu Sans
+  monofont: DejaVu Sans Mono
+metadata:
+  title: "Project Repositories Summary"

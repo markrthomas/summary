@@ -1,5 +1,7 @@
 PANDOC ?= pandoc
-PDF_ENGINE ?= pdflatex
+PANDOCDEF ?= $(CURDIR)/.pandoc-pdf-defaults.yaml
+PANDOC_PDF_OPTS ?=
+
 SRC := README.md
 PDF_SRC := .README.report.md
 TITLE_MD := .report-title.md
@@ -11,7 +13,7 @@ HEADER_TEX := .pandoc-header.tex
 
 help:
 	@echo "Targets:"
-	@echo "  make pdf   - Convert $(SRC) to $(PDF_OUT)"
+	@echo "  make pdf   - Convert $(SRC) to $(PDF_OUT) (Pandoc + XeLaTeX + DejaVu; see .pandoc-pdf-defaults.yaml)"
 	@echo "  make html  - Convert $(SRC) to $(HTML_OUT)"
 	@echo "  make clean - Remove generated documents"
 	@echo "  make distclean - Also remove local PDF preview artifacts"
@@ -23,16 +25,8 @@ $(PDF_SRC): $(TITLE_MD) $(SRC)
 	printf '\n' >> "$(PDF_SRC)"
 	sed '1{/^# /d;}' "$(SRC)" >> "$(PDF_SRC)"
 
-$(PDF_OUT): $(PDF_SRC) $(HEADER_TEX)
-	$(PANDOC) "$(PDF_SRC)" -o "$(PDF_OUT)" --pdf-engine="$(PDF_ENGINE)" \
-		--standalone \
-		--toc \
-		--metadata title="Project Repositories Summary" \
-		-V geometry:margin=1in \
-		-V fontsize=11pt \
-		-V linestretch=1.1 \
-		-V colorlinks=true \
-		-H "$(HEADER_TEX)"
+$(PDF_OUT): $(PDF_SRC) $(HEADER_TEX) $(PANDOCDEF)
+	$(PANDOC) --defaults "$(PANDOCDEF)" $(PANDOC_PDF_OPTS) -H "$(HEADER_TEX)" "$(PDF_SRC)" -o "$(PDF_OUT)"
 
 html: $(HTML_OUT)
 
