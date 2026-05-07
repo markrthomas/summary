@@ -1,5 +1,7 @@
 # Project Repositories Summary
 
+**Snapshot dates** here (the **inspected on** line, maintenance section headings, and **Verification stamp**) use **this workstation's local calendar day** — i.e. what `date` reports under your current **`TZ`** / system clock — **not** UTC, unless a note says otherwise.
+
 This directory contains 9 Git repositories. The notes below reflect each repo's local `README.md`, top-level files, and Git status as inspected on **2026-05-06**.
 
 ## 2026-05-06 maintenance update
