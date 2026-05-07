@@ -1,10 +1,11 @@
 # Project Repositories Summary
 
-This directory contains 9 Git repositories. The notes below reflect each repo's local `README.md`, top-level files, and Git status as inspected on **2026-05-07**.
+This directory contains 9 Git repositories. The notes below reflect each repo's local `README.md`, top-level files, and Git status as inspected on **2026-05-06**.
 
-## 2026-05-07 maintenance update
+## 2026-05-06 maintenance update
 
 - Re-surveyed all nine sub-repos for newest commits, branch alignment, and working-tree noise.
+- **Verification stamp:** on **2026-05-06**, each clone matches **`origin`** (**ahead 0 / behind 0** after **`git fetch`**) and local dirt matches the **Repository notes** section (`NOTES`, generated UVM PDF) where called out.
 - **`chi-to-bow-bridge`**: merged PR #19 — shared Pandoc defaults (**XeLaTeX** + **DejaVu** fonts), Makefiles use **`--defaults`** with **`docs/pandoc-pdf-defaults.yaml`** for design/integration/UVM/Verilator README PDFs; UVM Markdown reflow for PDF-safe layout (`docs/pandoc-pdf.md`). Repo remains Cocotb + Icarus core with **`vlate_bench/`** Verilator parity TB and optional **`uvm_bench/`** VCS/UVM.
 - **`IP-axi-to-2apbs`**: documentation refresh — UVM README maps, PDF-friendly trees, **`readme-md-pdfs`** Make target.
 - **`IP-ucie-rdi-to-pcie-pipe`**: UVM documentation PDF formatting polish; working tree still has **untracked** `NOTES` and `test/uvm/UVM_README.pdf`.
