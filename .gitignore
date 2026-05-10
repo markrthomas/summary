@@ -7,3 +7,5 @@
 !.pandoc-pdf-defaults.yaml
 !.report-title.md
 !DV_STANDARDS.md
+!dv_env.mk
+!dv_audit.sh

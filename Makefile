@@ -2,6 +2,8 @@ PANDOC ?= pandoc
 PANDOCDEF ?= $(CURDIR)/.pandoc-pdf-defaults.yaml
 PANDOC_PDF_OPTS ?=
 
+RTL_REPOS := IP-axi-to-2apbs chi-to-bow-bridge axi4_to_dfi_ddr ucie-cxl-bridge IP-ucie-rdi-to-pcie-pipe
+
 SRC := README.md
 PDF_SRC := .README.report.md
 TITLE_MD := .report-title.md
@@ -9,7 +11,17 @@ PDF_OUT := README.pdf
 HTML_OUT := README.html
 HEADER_TEX := .pandoc-header.tex
 
-.PHONY: help pdf html clean distclean
+.PHONY: help pdf html clean distclean regress audit
+
+regress:
+	@for r in $(RTL_REPOS); do \
+	  echo "[REGRESS] $$r ..."; \
+	  $(MAKE) -C "$(CURDIR)/$$r" regress || exit 1; \
+	done
+	@echo "[REGRESS] All repos passed."
+
+audit:
+	@bash "$(CURDIR)/dv_audit.sh"
 
 help:
 	@echo "Targets:"

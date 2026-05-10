@@ -92,6 +92,18 @@ Current deviations (tracked in TODO below):
 
 ## TODO list
 
+### Done (2026-05-09 alignment sweep)
+
+- [x] Create `dv_env.mk` at workspace root as canonical tool version pin source
+      (`OSS_CAD_SUITE_VERSION`, `COCOTB_PIP_SPEC`)
+- [x] Create `dv_audit.sh` — checks all 5 repos for standard targets, CI file name,
+      and version pin alignment. Run via `make audit` from workspace root.
+- [x] Add `make regress` to workspace root Makefile (iterates all 5 repos)
+- [x] Pin `cocotb==1.8.1` in all 4 CI files that install cocotb (was unpinned)
+- [x] Rename `IP-ucie-rdi-to-pcie-pipe` CI file: `verilator.yml` → `ci.yml`
+- [x] Add `sim` alias to `chi-to-bow-bridge`, `axi4_to_dfi_ddr`, and
+      `IP-ucie-rdi-to-pcie-pipe` Makefiles for DV_STANDARDS.md compliance
+
 ### Done (2026-05-09 sweep)
 
 - [x] Add `regress`, `lint`, `coverage`, `formal`, `ci` to root Makefile of all 5 repos
@@ -150,8 +162,8 @@ Current deviations (tracked in TODO below):
   the CI `vlate-bench` job as an artifact upload. Already works locally via
   `make oss-regress-coverage`.
 
-- [ ] **Rename IP-ucie-rdi-to-pcie-pipe CI file**: `verilator.yml` →
-  `ci.yml` for consistency. Update any badge links in `README.md`.
+- [x] **Rename IP-ucie-rdi-to-pcie-pipe CI file**: `verilator.yml` →
+  `ci.yml` (done 2026-05-09; update badge links in README.md if needed).
 
 - [ ] **Assertion inventory**: Add `ASSERTIONS.md` to each repo listing every
   checked property, the file it lives in, and the simulator/tool that checks it.
