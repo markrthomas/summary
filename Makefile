@@ -1,8 +1,9 @@
 PANDOC ?= pandoc
 PANDOCDEF ?= $(CURDIR)/.pandoc-pdf-defaults.yaml
 PANDOC_PDF_OPTS ?=
+PYTHON ?= python3
 
-RTL_REPOS := IP-axi-to-2apbs chi-to-bow-bridge axi4_to_dfi_ddr ucie-cxl-bridge IP-ucie-rdi-to-pcie-pipe
+RTL_REPOS := IP-axi-to-2apbs chi-to-bow-bridge axi4_to_dfi_ddr ucie-cxl-bridge IP-ucie-rdi-to-pcie-pipe si5_prep
 
 SRC := README.md
 PDF_SRC := .README.report.md
@@ -11,12 +12,21 @@ PDF_OUT := README.pdf
 HTML_OUT := README.html
 HEADER_TEX := .pandoc-header.tex
 
-.PHONY: help pdf html clean distclean regress audit
+.DEFAULT_GOAL := update-readme
+
+.PHONY: help pdf html clean distclean regress audit update-readme
+
+update-readme:
+	@$(PYTHON) "$(CURDIR)/update_readme.py"
 
 regress:
 	@for r in $(RTL_REPOS); do \
-	  echo "[REGRESS] $$r ..."; \
-	  $(MAKE) -C "$(CURDIR)/$$r" regress || exit 1; \
+	  case "$$r" in \
+	    si5_prep) tgt=regression ;; \
+	    *)        tgt=regress ;; \
+	  esac; \
+	  echo "[REGRESS] $$r ($$tgt) ..."; \
+	  $(MAKE) -C "$(CURDIR)/$$r" $$tgt || exit 1; \
 	done
 	@echo "[REGRESS] All repos passed."
 
@@ -25,6 +35,8 @@ audit:
 
 help:
 	@echo "Targets:"
+	@echo "  make (no args) - Run update-readme (default goal)"
+	@echo "  make update-readme - Refresh README.md per-repo state via update_readme.py"
 	@echo "  make pdf   - Convert $(SRC) to $(PDF_OUT) (Pandoc + XeLaTeX + DejaVu; see .pandoc-pdf-defaults.yaml)"
 	@echo "  make html  - Convert $(SRC) to $(HTML_OUT)"
 	@echo "  make clean - Remove generated documents, coverage info, PDF previews, .pytest_cache"
