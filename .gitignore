@@ -1,7 +1,6 @@
 *
 !.gitignore
 !README.md
-!README.pdf
 !Makefile
 !.pandoc-header.tex
 !.pandoc-pdf-defaults.yaml

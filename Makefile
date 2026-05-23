@@ -27,8 +27,8 @@ help:
 	@echo "Targets:"
 	@echo "  make pdf   - Convert $(SRC) to $(PDF_OUT) (Pandoc + XeLaTeX + DejaVu; see .pandoc-pdf-defaults.yaml)"
 	@echo "  make html  - Convert $(SRC) to $(HTML_OUT)"
-	@echo "  make clean - Remove generated documents"
-	@echo "  make distclean - Also remove local PDF preview artifacts"
+	@echo "  make clean - Remove generated documents, coverage info, PDF previews, .pytest_cache"
+	@echo "  make distclean - Alias for clean"
 
 pdf: $(PDF_OUT)
 
@@ -47,6 +47,8 @@ $(HTML_OUT): $(SRC)
 
 clean:
 	rm -f "$(PDF_OUT)" "$(HTML_OUT)" "$(PDF_SRC)"
+	rm -f coverage.info coverage_burst.info coverage_simple.info
+	rm -f readme-page-*.png
+	rm -rf .pytest_cache
 
 distclean: clean
-	rm -f readme-page-*.png
