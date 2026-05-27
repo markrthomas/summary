@@ -1,7 +1,7 @@
 # DV Standards — RTL Workspace
 
 **Applies to:** `IP-axi-to-2apbs`, `IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`,
-`chi-to-bow-bridge`, `ucie-cxl-bridge`
+`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`
 
 ---
 
@@ -20,7 +20,7 @@ Every RTL repo must expose these root-level targets with consistent semantics:
 | `make stress` | Stress / randomized simulation (if applicable) | Always |
 | `make clean` | Remove all build artifacts | Always |
 
-### Implementation status (2026-05-09)
+### Implementation status (2026-05-26 — tilelink_to_AXI4 formal landed)
 
 | Repo | lint | sim | regress | coverage | formal | ci | CI workflow |
 |------|------|-----|---------|----------|--------|----|-------------|
@@ -29,6 +29,7 @@ Every RTL repo must expose these root-level targets with consistent semantics:
 | axi4_to_dfi_ddr | ✓ alias | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ existing | ✓ coverage job |
 | chi-to-bow-bridge | ✓ | ✓ | ✓ | ✓ alias | ✓ (SymbiYosys) | ✓ | ✓ existing |
 | ucie-cxl-bridge | ✓ | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ | ✓ coverage job |
+| tilelink_to_AXI4 | ✓ | ✓ (Verilator C++) | ✓ | ✓ (Verilator C++, 98.9%) | ✓ (SymbiYosys) | ✓ | ✗ |
 
 ---
 
