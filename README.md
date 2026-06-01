@@ -73,10 +73,10 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 ### `cxl_lpddr5x_bridge`
 
 - Purpose: bridge RTL translating CXL.mem (M2S/S2M) traffic to an LPDDR5X-style memory interface with credit-based flow control and clock-domain crossing.
-- Highlights: `async_fifo` Gray-pointer CDC, `credit_counter` / `credit_pulse_sync` flow control, `reset_sync` / `reset_drain` reset handling, per-message CRC validation with bad-CRC reject; OSS DV stack — Icarus self-checking directed TB (opcodes, error injection, 1:1/2:1/1:3 clock ratios, backpressure stress), 12 cocotb UVM-equivalent tests, SymbiYosys BMC+cover on `credit_counter` / `reset_drain` / bridge top (6/6 PASS); root `Makefile` (`lint/sim/regress/coverage/formal/ci`) + `.github/workflows/ci.yml`.
+- Highlights: `async_fifo` Gray-pointer CDC, `credit_counter` / `credit_pulse_sync` flow control, `reset_sync` / `reset_drain` reset handling, per-message CRC validation with bad-CRC reject; OSS DV stack — Icarus self-checking directed TB (opcodes, error injection, 1:1/2:1/1:3 clock ratios, backpressure stress), 12 cocotb UVM-equivalent tests, SymbiYosys BMC+cover on `credit_counter` / `reset_drain` / bridge top (6/6 PASS), Verilator C++ coverage harness at 96.9% line coverage; root `Makefile` (`lint/sim/regress/coverage/formal/ci`) + `.github/workflows/ci.yml`.
 - Current state: clean working tree on `main`.
 - Last commit: `f87191c` — "Initial commit: CXL↔LPDDR5X bridge RTL + OSS DV stack".
-- **Plan (`doc/PLAN.md`):** Near-term — Verilator `sim/sim_main.cpp` coverage harness (replace the `make coverage` stub, ≥80% line floor), extended bad-CRC / credit-underflow negatives. Medium-term — raise bridge BMC depth past 16 via k-induction, populate the VCS UVM bench. Long-term — LPDDR5X bank/timing scheduler model, synthesis/timing hooks, Pandoc design-spec PDF.
+- **Plan (`doc/PLAN.md`):** Near-term — close the residual ~3% coverage (defensive default branches), extended bad-CRC / credit-underflow negatives. Medium-term — raise bridge BMC depth past 16 via k-induction, populate the VCS UVM bench. Long-term — LPDDR5X bank/timing scheduler model, synthesis/timing hooks, Pandoc design-spec PDF.
 
 ### `pc-wsl-github-starter`
 
