@@ -1,7 +1,7 @@
 # DV Standards — RTL Workspace
 
 **Applies to:** `IP-axi-to-2apbs`, `IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`,
-`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`
+`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`, `cxl_lpddr5x_bridge`
 
 ---
 
@@ -20,7 +20,7 @@ Every RTL repo must expose these root-level targets with consistent semantics:
 | `make stress` | Stress / randomized simulation (if applicable) | Always |
 | `make clean` | Remove all build artifacts | Always |
 
-### Implementation status (2026-05-26 — tilelink_to_AXI4 cocotb landed)
+### Implementation status (2026-05-31 — cxl_lpddr5x_bridge DV-standardized)
 
 | Repo | lint | sim | regress | coverage | formal | ci | CI workflow |
 |------|------|-----|---------|----------|--------|----|-------------|
@@ -30,6 +30,7 @@ Every RTL repo must expose these root-level targets with consistent semantics:
 | chi-to-bow-bridge | ✓ | ✓ | ✓ | ✓ alias | ✓ (SymbiYosys) | ✓ | ✓ existing |
 | ucie-cxl-bridge | ✓ | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ | ✓ coverage job |
 | tilelink_to_AXI4 | ✓ | ✓ (Verilator C++ + cocotb Icarus) | ✓ | ✓ (Verilator C++, 97.1%) | ✓ (SymbiYosys) | ✓ | ✗ |
+| cxl_lpddr5x_bridge | ✓ | ✓ (Icarus + cocotb Icarus) | ✓ | stub (no sim_main.cpp yet) | ✓ (SymbiYosys, 6/6) | ✓ | ✓ regress/coverage/cocotb/formal |
 
 ---
 
