@@ -35,16 +35,33 @@ def git(repo, *args):
 
 
 def repo_state(repo):
-    branch = git(repo, "rev-parse", "--abbrev-ref", "HEAD")
-    sha = git(repo, "log", "-1", "--format=%h")
-    subject = git(repo, "log", "-1", "--format=%s")
+    try:
+        branch = git(repo, "rev-parse", "--abbrev-ref", "HEAD")
+    except subprocess.CalledProcessError:
+        branch = "(detached)"
+    try:
+        sha = git(repo, "log", "-1", "--format=%h")
+        subject = git(repo, "log", "-1", "--format=%s")
+        has_commits = True
+    except subprocess.CalledProcessError:
+        sha = ""
+        subject = ""
+        has_commits = False
+        try:
+            branch_full = git(repo, "symbolic-ref", "--short", "HEAD")
+            branch = branch_full
+        except subprocess.CalledProcessError:
+            pass
     porcelain = git(repo, "status", "--porcelain")
     has_upstream = True
     ahead = behind = 0
-    try:
-        ab = git(repo, "rev-list", "--left-right", "--count", "HEAD...@{u}")
-        ahead, behind = (int(x) for x in ab.split())
-    except subprocess.CalledProcessError:
+    if has_commits:
+        try:
+            ab = git(repo, "rev-list", "--left-right", "--count", "HEAD...@{u}")
+            ahead, behind = (int(x) for x in ab.split())
+        except subprocess.CalledProcessError:
+            has_upstream = False
+    else:
         has_upstream = False
     modified = [ln for ln in porcelain.splitlines() if not ln.startswith("??")]
     untracked = [ln[3:] for ln in porcelain.splitlines() if ln.startswith("??")]
@@ -52,6 +69,7 @@ def repo_state(repo):
         branch=branch, sha=sha, subject=subject,
         ahead=ahead, behind=behind, has_upstream=has_upstream,
         modified=modified, untracked=untracked,
+        has_commits=has_commits,
     )
 
 
@@ -64,13 +82,19 @@ def _sync_phrase(s):
     return ", ".join(parts)
 
 
+def _fmt_files(files, cap=3):
+    if len(files) <= cap:
+        return ", ".join(f"`{u}`" for u in files)
+    head = ", ".join(f"`{u}`" for u in files[:cap])
+    return f"{head}, and {len(files) - cap} more"
+
+
 def short_state(s):
     """Compact 'At a glance' state phrase."""
     if s["modified"]:
         cleanliness = "dirty"
     elif s["untracked"]:
-        files = ", ".join(f"`{u}`" for u in s["untracked"])
-        cleanliness = f"clean except untracked {files}"
+        cleanliness = f"clean except untracked {_fmt_files(s['untracked'], cap=2)}"
     else:
         cleanliness = "clean"
     sync = _sync_phrase(s)
@@ -90,8 +114,7 @@ def long_state(s):
     if s["modified"]:
         extras.append(f"**dirty** ({len(s['modified'])} uncommitted change(s))")
     if s["untracked"]:
-        files = ", ".join(f"`{u}`" for u in s["untracked"])
-        extras.append(f"**untracked** {files} locally")
+        extras.append(f"**untracked** {_fmt_files(s['untracked'], cap=4)} locally")
     if not extras:
         return head + "."
     return head + "; " + "; ".join(extras) + "."
@@ -102,6 +125,16 @@ def update():
     today = datetime.date.today().isoformat()
     repos = sub_repos()
     states = {r: repo_state(r) for r in repos}
+
+    documented = set(re.findall(r"^### `([^`]+)`\s*$", text, flags=re.MULTILINE))
+    on_disk = set(repos)
+    missing = sorted(on_disk - documented)
+    stale = sorted(documented - on_disk)
+    if missing:
+        print(f"warn: {len(missing)} sub-repo(s) on disk but not in README: {', '.join(missing)}", file=sys.stderr)
+        print("      add an 'At a glance' bullet and a `### \\`<repo>\\`` section, then re-run make.", file=sys.stderr)
+    if stale:
+        print(f"warn: {len(stale)} README section(s) refer to repos no longer on disk: {', '.join(stale)}", file=sys.stderr)
 
     text = re.sub(
         r"This directory contains \d+ Git repositories\.(.*?)inspected on \*\*\d{4}-\d{2}-\d{2}\*\*\.",
