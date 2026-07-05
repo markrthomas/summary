@@ -19,9 +19,9 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - `IP-ucie-rdi-to-pcie-pipe`: UCIe RDI to PCIe PIPE bridge RTL. Stack: SystemVerilog, Verilator, vendor simulators. State: `main`, clean. Plan: `docs/verification_plan.md`.
 - `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `main`, clean. Plan: `docs/PLAN.md`.
 - `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc, optional VCS/UVM DV. State: `main`, clean. Plan: `doc/FULL_FUNCTIONALITY_PLAN.md`.
-- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, integration + **`vlate_bench`** Verilator TB, optional **`uvm_bench`** VCS/UVM, Pandoc/XeLaTeX PDFs. State: `main`, clean, ahead 1 of `origin/main`. Plan: `docs/PLAN.md`.
+- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, integration + **`vlate_bench`** Verilator TB, optional **`uvm_bench`** VCS/UVM, Pandoc/XeLaTeX PDFs. State: `main`, clean. Plan: `docs/PLAN.md`.
 - `chi-to-cxl-bridge`: CHI to CXL.mem bridge RTL (compact 64-bit protocol abstraction). Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys, cocotb. State: `main`, dirty. Plan: `doc/PLAN.md`.
-- `chi-to-ucie-bridge`: CHI to UCIe adapter-link bridge (Phase 1 RTL scaffold + UVM TB underway). Stack: Verilog/SystemVerilog, Icarus, Verilator, UVM. State: `master`, clean, ahead 10 of `origin/master`. Plan: `doc/PLAN.md`.
+- `chi-to-ucie-bridge`: CHI to UCIe adapter-link bridge (Phase 1 RTL scaffold + UVM TB underway). Stack: Verilog/SystemVerilog, Icarus, Verilator, UVM. State: `master`, clean. Plan: `doc/PLAN.md`.
 - `chipyard`: Upstream Berkeley UCB-BAR Chipyard SoC framework (Chisel, Rocket Chip, BOOM, FireSim, Hammer). Stack: Chisel/Scala, sbt, mill, Verilator. State: `main`, dirty. Plan: upstream (no local plan).
 - `chisel-playground`: Chisel project template / starter (post-Chisel-Bootcamp). Stack: Chisel3, Mill/SBT, Verilator, JDK 11+. State: `master`, clean except untracked `.github/`, `.gitignore`, and 20 more. Plan: upstream (no local plan).
 - `cxl_lpddr5x_bridge`: CXL.mem to LPDDR5X bridge RTL. Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys, cocotb. State: `main`, clean. Plan: `doc/PLAN.md`.
@@ -71,8 +71,8 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 
 - Purpose: starter CHI-to-BoW bridge that packetizes simplified CHI requests into BoW flits and reconstructs responses.
 - Highlights: Cocotb + Icarus unit/integration flows; integration top with reference BFM; OSS **`vlate_bench/`** Verilator + C++ parity TB (lint/run/coverage hooks); optional **`uvm_bench/`** Synopsys VCS / UVM bench with onboarding/quickref PDFs; integration protocol checker bind coverage across flows; BoW RX inject path + unknown-txn **`RSP_HDR`** parity; OSS regression Makefile targets; Markdown→PDF via Pandoc **XeLaTeX** + **DejaVu** (`docs/pandoc-pdf-defaults.yaml`, `docs/pandoc-pdf-header.tex`).
-- Current state: `main` ahead 1 of `origin/main`.
-- Last commit: `c665ca2` — "Implement duplicate, orphan, and illegal response header integration scenarios under Cocotb and Verilator".
+- Current state: clean working tree on `main`.
+- Last commit: `a94e0e7` — "Implement duplicate, orphan, and illegal response header integration scenarios under Cocotb and Verilator (#23)".
 - **Plan (`docs/PLAN.md`):** Near-term — deeper integration error-path via `bow_inj_*` (dup/orphan payloads), machine-readable golden-payload header export. Medium-term — CHI fidelity (split REQ/RSP/DAT channels), distinct write-data beats per REQ_DATA, QoS/fairness arbiter. Long-term — industry BoW/CHI compliance suites, performance modeling (throughput vs FIFO depth), power-aware link assumptions.
 
 ### `chi-to-cxl-bridge`
@@ -87,7 +87,7 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 
 - Purpose: experimental CHI Request-Node ↔ UCIe adapter-link bridge — translates CHI requests to checksum-protected UCIe adapter headers (and optional data) and returns UCIe completions as CHI `Comp` / `CompData` responses.
 - Highlights: Phase 1 RTL scaffold with `chi_to_ucie_bridge.v` top, dual-clock CDC FIFOs / 2-flop synchronizers, reset + link-drain gating, checksum-protected UCIe headers, self-checking directed testbench. UVM testbench foundation in progress (generic agents/drivers/items under `verification/uvm/`).
-- Current state: `master` ahead 10 of `origin/master`.
+- Current state: clean working tree on `master`.
 - Last commit: `fe2a189` — "Coverage: add coverage-report and coverage-html Makefile targets".
 - **Plan (`doc/PLAN.md`):** Near-term — finish UVM agents/sequences, integrate scoreboard, baseline coverage. Medium-term — bit-closer UCIe adapter modeling, formal CDC / handshake properties, multi-lane scaling. Long-term — full UCIe wire-shape fidelity, end-to-end CHI-UCIe-CHI loopback in a sysmodel.
 
