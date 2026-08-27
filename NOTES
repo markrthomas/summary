@@ -1,131 +1,43 @@
-# Session Restart Notes
+# Session Restart Notes (~/proj)
 
-_Purpose: if the WSL session dies (OOM during UVM/Verilator builds), read this first to get back up to speed fast. Updated periodically by Claude._
+_Purpose: if a WSL session dies (OOM during UVM/Verilator builds), read this to
+get back up to speed. Cross-repo notes only — repo-specific knowledge lives in
+each repo. Updated periodically by Claude._
 
-Last updated: 2026-08-27 (lint milestone added)
+Last updated: 2026-08-27
 
-## PROGRESS (2026-08-27)
-- Target bench identified: IP-axi-to-2apbs/uvm/vlt (own git repo,
-  github.com/markrthomas/IP-axi-to-2apbs). Well-formed Verilator UVM Makefile
-  already there; BUILD_JOBS=1 and --CFLAGS -O0 are the RAM-safe defaults.
-- UVM_HOME = /home/markt/verilator/test_regress/t/uvm  (has
-  uvm_pkg_all_v2020_3_1_dpi.svh and v2020_3_1/dpi/uvm_dpi.cc).
-- LINT-ONLY PASSES: with VERILATOR_ROOT unset + ~/verilator/bin/verilator,
-  `--lint-only --timing` on tb_uvm_simple = exit 0, peak RSS 331 MB, 5.6 s.
-  Front-end (elaborate) is cheap and clean. Only warning: WIDTHEXPAND at
-  sv/pkg/bridge_uvm_tests_pkg.sv:434 (n_txn+64, 32-bit LHS in longint' expr;
-  cosmetic).
-- CONCLUSION: OOM is 100% the `--binary` g++ step (2463 generated C++ files).
-  Lint = 331 MB; the C++ compile = GBs. Do that step on a bigger-RAM host, or
-  a slow BUILD_JOBS=1 run under swap. DO NOT run the full build in-session.
-- DONE: added `lint`/`lint-<top>` targets to uvm/vlt/Makefile + fixed the :434
-  WIDTHEXPAND (cast n_txn to longint before +64). Committed in the
-  IP-axi-to-2apbs repo as b6a3470 (local, NOT pushed). Staged only those two
-  changes; that repo still has pre-existing WIP (6 modified SV files, untracked
-  .github/workflows/verilator-sim.yml, uvm/vlt/uvm_macros.svh, uvm/vlt/obj/) —
-  left untouched, user's to manage.
-- Run lint:  cd IP-axi-to-2apbs/uvm/vlt && ( unset VERILATOR_ROOT; make lint-simple \
-    VERILATOR=~/verilator/bin/verilator UVM_HOME=/home/markt/verilator/test_regress/t/uvm )
-  Guard heavy runs with `ulimit -v 3500000` in the subshell.
-- Other pre-existing cosmetic lint warnings NOT fixed (out of scope):
-  bridge_rand_stim.sv:215/216 (int unsigned <- narrower member),
-  !item.randomize() WIDTHTRUNC at bridge_rand_stim.sv:259 & tests_pkg:350.
+## IP-axi-to-2apbs — knowledge MIGRATED into the repo (2026-08-27)
+The UVM-on-Verilator work is DONE and green in CI, and all its detail now lives
+in the repo itself (not here):
+- `IP-axi-to-2apbs/CLAUDE.md` — agent-startup context + repo/workflow gotchas.
+- `IP-axi-to-2apbs/uvm/vlt/README.md` — the OSS Verilator UVM flow guide.
+- `IP-axi-to-2apbs/doc/PLAN.md` item 0 — status/next steps.
+Start a session in that repo and read those. (Result: `tb_uvm_simple` builds
+with `--binary` and runs `SIMPLE TEST PASSED` on a GitHub runner; the local OOM
+is sidestepped by building in CI.)
 
-## THE PLAN + in-process work (reviewed 2026-08-27)
-- IP-axi-to-2apbs/doc/PLAN.md was stale (dated 2026-05-14): baseline listed UVM
-  as VCS+Xcelium only, no Verilator. The active WIP = porting the SV UVM env to
-  run under OSS Verilator 5.050 (7 SV files w/ `ifndef VERILATOR guards: monitor
-  decoupled, cov collector excluded, vif/factory/cast fixes) + uvm/vlt/ flow.
-  Lint-clean; full --binary build unproven locally (OOM). Ahead of the plan.
-- DONE (a): rewrote .github/workflows/verilator-sim.yml (was a broken generic
-  stub referencing nonexistent sim_top.sv + apt UVM-incapable verilator). New CI
-  builds Verilator 5.050 from source (tag v5.050, matches ~/verilator), UVM_HOME
-  = its bundled test_regress/t/uvm, runs `make -C uvm/vlt lint` + `simple` with
-  BUILD_JOBS=nproc on the ~16 GB runner (the RAM the local 8 GB box lacks).
-  YAML validated OK.
-- DONE (b): added near-term item 0 (UVM-on-Verilator, IN PROGRESS) to PLAN.md +
-  updated baseline row.
-- COMMITTED + PUSHED: verilator-sim.yml + doc/PLAN.md landed as 882629f in
-  IP-axi-to-2apbs, pushed to origin main (e0bf6ed..882629f) via HTTPS
-  (git@ SSH origin fails auth here; gh is logged in over https as markrthomas —
-  push used: git push https://github.com/markrthomas/IP-axi-to-2apbs.git main).
-- CLOUD RUN LAUNCHED: push triggered "UVM on Verilator" workflow run
-  33112169828 (+ the repo's existing "CI" run 33112169831). This is the FIRST
-  full --binary UVM build anywhere (never succeeded locally due to OOM). Watching
-  via `gh run watch 33112169828 --exit-status` (bg task b72uo33nd). Check result:
-  gh run view 33112169828 --log-failed  (or the scratchpad uvm_run.log).
-- NOTE: ultrareview of these IP-axi-to-2apbs changes was NOT run (the one that
-  returned [] was scoped to ~/proj NOTES). Can still /code-review ultra from
-  inside IP-axi-to-2apbs if desired.
-- RUN 1 (33112169828) FAILED at "Lint UVM tops": root cause = uvm/vlt/uvm_macros.svh
-  (an empty include-shim) was UNTRACKED, so fresh CI checkout couldn't find it ->
-  11 cascading parse errors. Local lint-simple had passed only because the
-  untracked file was in my tree. Verilator 5.050 built fine from source; CI
-  toolchain is correct.
-- FIX (272208b, pushed): track uvm/vlt/uvm_macros.svh + add uvm/vlt/.gitignore
-  (obj/). Verified locally: `make lint` passes ALL 5 tops (simple/burst/
-  burst_ext/parameterized/regblock), exit 0, ~330 MB each.
-- RUN 2 (33112753441) FAILED at lint again — shim fixed the include error, but 9
-  REAL syntax errors remained (int unsigned'(...) two-word cast etc). ROOT CAUSE:
-  the whole UVM-on-Verilator PORT (7 modified uvm/sv files) was UNCOMMITTED. CI
-  checked out pre-port HEAD, which Verilator can't parse. Local lint passed only
-  because the WIP edits were in my working tree.
-- FIX (127a8d1, pushed): user approved committing the port as one commit. Staged
-  all 7: bridge_axi_monitor (decouple), bridge_cov_collector/bridge_env/
-  bridge_uvm_env_pkg (exclude covergroup under Verilator), bridge_rand_stim/
-  bridge_scoreboard/bridge_uvm_tests_pkg (cast/factory/vif fixes). Working tree
-  now CLEAN. The uvm/vlt flow + CI + port are all landed together now.
-- RUN 3 (33113536250, head 127a8d1) = SUCCESS (8m36s). GREEN END-TO-END:
-  * lint: all 5 tops pass (~330 MB, ~4.6s each).
-  * --binary smoke build (tb_uvm_simple): 2677 C++ files, peak 339 MB, 76s build
-    on 4 threads — the exact step that OOMed the 8 GB WSL box; trivial on runner.
-  * UVM run: "SIMPLE TEST PASSED", scoreboard axi_wr=2 axi_rd=2 apb0=2 apb1=2
-    mism=0, UVM_ERROR=0 UVM_FATAL=0.
-  => OSS UVM-on-Verilator proven in cloud CI; local OOM fully sidestepped. DONE.
-  Remaining optional: extend CI beyond `simple` to burst/burst_ext/parameterized/
-  regblock; fix the repeated Verilator cache miss (speed only); ultrareview the
-  branch; the cosmetic randomize()/width warnings.
+## General WSL2 RAM ceiling (applies to ALL repos here)
+- Host is ~8 GB physical; WSL sees ~5.7 GB. `.wslconfig memory=16GB` is silently
+  ignored (can't exceed physical) — this is why the chipyard "RAM bump" never
+  took (see [[chipyard_install_state]]). Swap = 8 GB on /dev/sdc, nproc = 12.
+- Verilator `--lint-only` of a UVM bench is cheap (~330 MB). The full `--binary`
+  g++ compile OOMs and can kill the whole WSL VM/session. Strategy: lint locally;
+  run the heavy `--binary` build in cloud CI, or locally only with
+  `--build-jobs 1 --CFLAGS -O0` under a `ulimit -v` guard in a subshell so a
+  blowup dies alone.
 
+## General OSS Verilator UVM toolchain (see memory [[oss-uvm-verilator]])
+- `~/verilator/bin/verilator` = Verilator 5.050 — the ONLY local one that runs
+  UVM. The OSS CAD Suite Verilator does NOT.
+- **`unset VERILATOR_ROOT`** after sourcing `~/oss-cad-suite/environment` — the
+  stale value it exports makes `~/verilator/bin/verilator` hard-error.
+- `UVM_HOME` = `~/verilator/test_regress/t/uvm` (bundled Accellera UVM 2020.3.1:
+  `uvm_pkg_all_v2020_3_1_dpi.svh` + `v2020_3_1/dpi/uvm_dpi.cc`).
+- Other UVM benches to port next (same pattern): `~/proj/*/uvm`,
+  `chi-to-bow-bridge/uvm_bench` (VCS), `axi-on-ucie-to-mem`, `uvm_review`,
+  `si5_prep`. `chi-to-bow-bridge/vlate_bench` is a C++ TB, not UVM.
 
-
-## Current task
-Getting SystemVerilog UVM benches to run under the OSS Verilator stack
-(~/verilator 5.050 + ~/uvm-verilator). The session keeps dying: UVM+Verilator
-builds OOM the whole WSL VM.
-
-## Root causes (confirmed this session)
-1. **Stale VERILATOR_ROOT.** Sourcing ~/oss-cad-suite/environment exports
-   VERILATOR_ROOT=/home/markt/oss-cad-suite/share/verilator. That makes
-   ~/verilator/bin/verilator hard-error ("inconsistent path"). FIX: `unset
-   VERILATOR_ROOT` AFTER sourcing the OSS CAD Suite env. Then
-   ~/verilator/bin/verilator = 5.050 works (verified).
-2. **RAM ceiling is ~5.7 GB, not 16 GB.** .wslconfig says memory=16GB but
-   MemTotal is 5.9 GB. WSL2 defaults to ~50% of host -> host is ~8 GB physical.
-   memory=16GB CANNOT be honored on an 8 GB machine (silently ignored). This is
-   why the "WSL2 RAM bump" (chipyard) never took. Swap = 8 GB on /dev/sdc.
-   nproc = 12.
-3. **UVM-on-Verilator build OOMs** because default build fans out to
-   --build-jobs / make -j across 12 cores with g++ -O2; a dozen cc1plus at
-   1-2 GB each blows past 5.7 GB + swap and WSL kills the VM (no dmesg trace).
-
-## Fix strategy (fit the build to available RAM, fail alone not whole VM)
-- Serialize + de-optimize C++: `verilator --build-jobs 1 --no-threads -CFLAGS "-O0"`
-  (-O0 is the biggest peak-RAM win for Verilated UVM; -O2 is the hog).
-- Guard with per-process cap so a runaway dies with an error instead of killing
-  WSL: run build in a subshell under `ulimit -v` (~4 GB).
-- Always `--lint-only` first (near-zero RAM) before full elaborate+compile.
-- Wrap all of the above in a script (unset VERILATOR_ROOT, ~/verilator/bin first
-  on PATH, the flags above).
-
-## Key paths
-- ~/verilator/bin/verilator          -> Verilator 5.050 (only one that runs UVM)
-- ~/uvm-verilator                     -> Accellera UVM 1800.2-2020 3.2 kit
-- ~/oss-cad-suite                     -> OSS CAD Suite (its Verilator does NOT run UVM)
-- UVM benches: ~/proj/*/uvm , chi-to-bow-bridge/uvm_bench (VCS),
-  chi-to-bow-bridge/vlate_bench (C++ TB, not UVM)
-- No committed UVM+Verilator build script found yet (stack set up 2026-08-27);
-  build was likely being assembled by hand.
-
-## Next step when resuming
-Identify which bench was being built, write the memory-bounded wrapper script,
-run --lint-only first, then a single controlled --build-jobs 1 -O0 compile.
+## Git / push gotcha (this environment)
+- SSH `origin` (`git@github.com:...`) fails auth here. Push over HTTPS — `gh` is
+  logged in as `markrthomas`:
+  `git push https://github.com/markrthomas/<repo>.git <branch>`
