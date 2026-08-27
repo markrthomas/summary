@@ -1,43 +1,59 @@
 # Session Restart Notes (~/proj)
 
-_Purpose: if a WSL session dies (OOM during UVM/Verilator builds), read this to
-get back up to speed. Cross-repo notes only — repo-specific knowledge lives in
-each repo. Updated periodically by Claude._
+_Cross-repo notes. Repo-specific knowledge lives in each repo (CLAUDE.md,
+uvm/vlt/README.md). Updated periodically by Claude._
 
 Last updated: 2026-08-27
 
-## IP-axi-to-2apbs — knowledge MIGRATED into the repo (2026-08-27)
-The UVM-on-Verilator work is DONE and green in CI, and all its detail now lives
-in the repo itself (not here):
-- `IP-axi-to-2apbs/CLAUDE.md` — agent-startup context + repo/workflow gotchas.
-- `IP-axi-to-2apbs/uvm/vlt/README.md` — the OSS Verilator UVM flow guide.
-- `IP-axi-to-2apbs/doc/PLAN.md` item 0 — status/next steps.
-Start a session in that repo and read those. (Result: `tb_uvm_simple` builds
-with `--binary` and runs `SIMPLE TEST PASSED` on a GitHub runner; the local OOM
-is sidestepped by building in CI.)
+## UVM-on-Verilator CAMPAIGN — HONEST STATUS (2026-08-27)
 
-## General WSL2 RAM ceiling (applies to ALL repos here)
-- Host is ~8 GB physical; WSL sees ~5.7 GB. `.wslconfig memory=16GB` is silently
-  ignored (can't exceed physical) — this is why the chipyard "RAM bump" never
-  took (see [[chipyard_install_state]]). Swap = 8 GB on /dev/sdc, nproc = 12.
-- Verilator `--lint-only` of a UVM bench is cheap (~330 MB). The full `--binary`
-  g++ compile OOMs and can kill the whole WSL VM/session. Strategy: lint locally;
-  run the heavy `--binary` build in cloud CI, or locally only with
-  `--build-jobs 1 --CFLAGS -O0` under a `ulimit -v` guard in a subshell so a
-  blowup dies alone.
+Goal: give every license-gated UVM bench a license-free OSS Verilator build+run
+in cloud CI (GitHub Actions builds Verilator 5.050 from source, lint + smoke).
 
-## General OSS Verilator UVM toolchain (see memory [[oss-uvm-verilator]])
-- `~/verilator/bin/verilator` = Verilator 5.050 — the ONLY local one that runs
-  UVM. The OSS CAD Suite Verilator does NOT.
-- **`unset VERILATOR_ROOT`** after sourcing `~/oss-cad-suite/environment` — the
-  stale value it exports makes `~/verilator/bin/verilator` hard-error.
-- `UVM_HOME` = `~/verilator/test_regress/t/uvm` (bundled Accellera UVM 2020.3.1:
-  `uvm_pkg_all_v2020_3_1_dpi.svh` + `v2020_3_1/dpi/uvm_dpi.cc`).
-- Other UVM benches to port next (same pattern): `~/proj/*/uvm`,
-  `chi-to-bow-bridge/uvm_bench` (VCS), `axi-on-ucie-to-mem`, `uvm_review`,
-  `si5_prep`. `chi-to-bow-bridge/vlate_bench` is a C++ TB, not UVM.
+### IMPORTANT CORRECTION
+CI reported "success" on EXIT CODE only. The UVM sim exits 0 even with
+UVM_ERRORs, so "success" did NOT mean the smoke test passed. Real status below.
 
-## Git / push gotcha (this environment)
-- SSH `origin` (`git@github.com:...`) fails auth here. Push over HTTPS — `gh` is
-  logged in as `markrthomas`:
-  `git push https://github.com/markrthomas/<repo>.git <branch>`
+### What is genuinely done
+- Flow + CI added to 8 repos; benches now BUILD and RUN under Verilator 5.050 in
+  the cloud (was impossible without VCS/Xcelium).
+- Verilator (first tool to ever parse these never-licensed benches) caught real
+  latent bugs, fixed:
+  * cxl_lpddr5x: task closed with endfunction -> endtask.
+  * chi-to-ucie: mailbox put() (blocking task) called in a function -> try_put().
+  * axi4_to_dfi_ddr: `uvm_field_time (not a UVM macro) -> `uvm_field_int;
+    illegal bit-select on paren-expr -> sized cast ID_W'(...).
+- si5_prep: private repo created + pushed (was LOCAL-ONLY). Verilator PORT
+  DEFERRED: reserved-word identifiers used as names (checker, strong),
+  import "DPI-C" inside a class, $get_coverage — needs refactor/guards.
+
+### THE BLOCKER (true-pass): randomize() fails under UVM on Verilator
+Real UVM results (build+run OK, but tests do not pass):
+| repo | UVM_ERROR | UVM_FATAL |
+|------|-----------|-----------|
+| apb-to-mem-all-py | 64 | 0 |
+| uvm_review | 64 | 0 |
+| apb-to-mem-bazel | 64 | 0 |
+| cxl_lpddr5x_bridge | 32 | 0 |
+| ucie-cxl-bridge | 0 | 1 (FATAL) |
+| axi-on-ucie / chi-to-ucie / axi4_dfi | (runs were still completing) | |
+Dominant cause = `apb_seq_item randomize() failed` on every txn. Verified:
+randomize() with inline constraints WORKS standalone in Verilator 5.050 (minimal
+test ok=10 fail=0), but FAILS on uvm_sequence_item-derived classes (through the
+UVM base-class chain). This is a Verilator/UVM randomize maturity issue, not a
+testbench bug — needs dedicated investigation, not a quick edit.
+
+### Decision needed from user (asked 2026-08-27)
+How to treat UVM_ERRORs / gate policy, and whether to invest in the
+Verilator-UVM randomize fix for true passes vs. ship build+run+no-FATAL CI and
+document the errors. Remaining repos not yet done: 3 small
+(IP-ucie-rdi-to-pcie-pipe, chi-to-bow-bridge, ucie_rdi_to_pcie6_pipe7) + si5_prep
+port. Ledger: scratchpad/campaign_ledger.md.
+
+## General WSL2 RAM ceiling / OSS Verilator toolchain
+- Host ~8 GB (WSL sees ~5.7 GB); memory=16GB in .wslconfig is ignored. Verilator
+  --lint-only ~330 MB (safe); full --binary OOMs -> build in cloud CI.
+- ~/verilator/bin/verilator = 5.050 (only local UVM-capable one). unset
+  VERILATOR_ROOT after sourcing OSS CAD Suite env. UVM_HOME=
+  ~/verilator/test_regress/t/uvm. See memory [[oss-uvm-verilator]].
+- SSH origin fails here; push via HTTPS (gh logged in as markrthomas).
