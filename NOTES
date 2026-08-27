@@ -18,8 +18,18 @@ Last updated: 2026-08-27 (lint milestone added)
 - CONCLUSION: OOM is 100% the `--binary` g++ step (2463 generated C++ files).
   Lint = 331 MB; the C++ compile = GBs. Do that step on a bigger-RAM host, or
   a slow BUILD_JOBS=1 run under swap. DO NOT run the full build in-session.
-- Reusable guarded lint one-liner lives in shell history; consider adding a
-  `lint` target to uvm/vlt/Makefile (separate repo — not committed yet).
+- DONE: added `lint`/`lint-<top>` targets to uvm/vlt/Makefile + fixed the :434
+  WIDTHEXPAND (cast n_txn to longint before +64). Committed in the
+  IP-axi-to-2apbs repo as b6a3470 (local, NOT pushed). Staged only those two
+  changes; that repo still has pre-existing WIP (6 modified SV files, untracked
+  .github/workflows/verilator-sim.yml, uvm/vlt/uvm_macros.svh, uvm/vlt/obj/) —
+  left untouched, user's to manage.
+- Run lint:  cd IP-axi-to-2apbs/uvm/vlt && ( unset VERILATOR_ROOT; make lint-simple \
+    VERILATOR=~/verilator/bin/verilator UVM_HOME=/home/markt/verilator/test_regress/t/uvm )
+  Guard heavy runs with `ulimit -v 3500000` in the subshell.
+- Other pre-existing cosmetic lint warnings NOT fixed (out of scope):
+  bridge_rand_stim.sv:215/216 (int unsigned <- narrower member),
+  !item.randomize() WIDTHTRUNC at bridge_rand_stim.sv:259 & tests_pkg:350.
 
 
 
