@@ -45,8 +45,18 @@ Last updated: 2026-08-27 (lint milestone added)
   YAML validated OK.
 - DONE (b): added near-term item 0 (UVM-on-Verilator, IN PROGRESS) to PLAN.md +
   updated baseline row.
-- These two edits (verilator-sim.yml, doc/PLAN.md) are UNCOMMITTED in
-  IP-axi-to-2apbs, pending user go-ahead to commit.
+- COMMITTED + PUSHED: verilator-sim.yml + doc/PLAN.md landed as 882629f in
+  IP-axi-to-2apbs, pushed to origin main (e0bf6ed..882629f) via HTTPS
+  (git@ SSH origin fails auth here; gh is logged in over https as markrthomas —
+  push used: git push https://github.com/markrthomas/IP-axi-to-2apbs.git main).
+- CLOUD RUN LAUNCHED: push triggered "UVM on Verilator" workflow run
+  33112169828 (+ the repo's existing "CI" run 33112169831). This is the FIRST
+  full --binary UVM build anywhere (never succeeded locally due to OOM). Watching
+  via `gh run watch 33112169828 --exit-status` (bg task b72uo33nd). Check result:
+  gh run view 33112169828 --log-failed  (or the scratchpad uvm_run.log).
+- NOTE: ultrareview of these IP-axi-to-2apbs changes was NOT run (the one that
+  returned [] was scoped to ~/proj NOTES). Can still /code-review ultra from
+  inside IP-axi-to-2apbs if desired.
 
 
 
