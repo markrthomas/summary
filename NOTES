@@ -31,6 +31,23 @@ Last updated: 2026-08-27 (lint milestone added)
   bridge_rand_stim.sv:215/216 (int unsigned <- narrower member),
   !item.randomize() WIDTHTRUNC at bridge_rand_stim.sv:259 & tests_pkg:350.
 
+## THE PLAN + in-process work (reviewed 2026-08-27)
+- IP-axi-to-2apbs/doc/PLAN.md was stale (dated 2026-05-14): baseline listed UVM
+  as VCS+Xcelium only, no Verilator. The active WIP = porting the SV UVM env to
+  run under OSS Verilator 5.050 (7 SV files w/ `ifndef VERILATOR guards: monitor
+  decoupled, cov collector excluded, vif/factory/cast fixes) + uvm/vlt/ flow.
+  Lint-clean; full --binary build unproven locally (OOM). Ahead of the plan.
+- DONE (a): rewrote .github/workflows/verilator-sim.yml (was a broken generic
+  stub referencing nonexistent sim_top.sv + apt UVM-incapable verilator). New CI
+  builds Verilator 5.050 from source (tag v5.050, matches ~/verilator), UVM_HOME
+  = its bundled test_regress/t/uvm, runs `make -C uvm/vlt lint` + `simple` with
+  BUILD_JOBS=nproc on the ~16 GB runner (the RAM the local 8 GB box lacks).
+  YAML validated OK.
+- DONE (b): added near-term item 0 (UVM-on-Verilator, IN PROGRESS) to PLAN.md +
+  updated baseline row.
+- These two edits (verilator-sim.yml, doc/PLAN.md) are UNCOMMITTED in
+  IP-axi-to-2apbs, pending user go-ahead to commit.
+
 
 
 ## Current task
