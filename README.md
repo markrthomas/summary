@@ -2,7 +2,7 @@
 
 **Snapshot dates** here (the **inspected on** line, maintenance section headings, and **Verification stamp**) use **this workstation's local calendar day** — i.e. what `date` reports under your current **`TZ`** / system clock — **not** UTC, unless a note says otherwise.
 
-This directory contains 16 Git repositories. The notes below reflect each repo's local `README.md`, top-level files, and Git status as inspected on **2026-07-05**.
+This directory contains 21 Git repositories. The notes below reflect each repo's local `README.md`, top-level files, and Git status as inspected on **2026-08-27**.
 
 ## 2026-05-09 maintenance update
 
@@ -15,22 +15,27 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 
 ## At a glance
 
-- `IP-axi-to-2apbs`: AXI to dual-APB4 bridge RTL. Stack: Verilog, Icarus, UVM. State: `main`, clean except untracked `sim_regblock`. Plan: `doc/PLAN.md`.
+- `IP-axi-to-2apbs`: AXI to dual-APB4 bridge RTL. Stack: Verilog, Icarus, UVM. State: `main`, dirty. Plan: `doc/PLAN.md`.
 - `IP-ucie-rdi-to-pcie-pipe`: UCIe RDI to PCIe PIPE bridge RTL. Stack: SystemVerilog, Verilator, vendor simulators. State: `main`, clean. Plan: `docs/verification_plan.md`.
 - `MiT_capstone_beetle_kill`: Forest bark beetle object detection. Stack: Python, PyTorch, pytest. State: `main`, clean. Plan: `docs/PLAN.md`.
-- `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc, optional VCS/UVM DV. State: `main`, clean. Plan: `doc/FULL_FUNCTIONALITY_PLAN.md`.
-- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, integration + **`vlate_bench`** Verilator TB, optional **`uvm_bench`** VCS/UVM, Pandoc/XeLaTeX PDFs. State: `main`, clean. Plan: `docs/PLAN.md`.
+- `apb-to-mem-all-py`: APB byte-wide 32K memory RTL + PyUVM testbench driven entirely by **pytest** (cocotb runner API). Derivative of `uvm_review`. Stack: Verilog, cocotb/PyUVM, pytest, Icarus, Verilator. State: `main`, clean. Plan: `docs/TUTORIAL.md` (no PLAN.md).
+- `apb-to-mem-bazel`: APB byte-wide 32K memory RTL + PyUVM testbench driven by **Bazel** (Starlark test rules over the cocotb runner). Derivative of `uvm_review`. Stack: Verilog, cocotb/PyUVM, Bazel/Starlark, Icarus, Verilator. State: `wave-launch-gtkwave`, dirty. Plan: `docs/TUTORIAL.md` (no PLAN.md).
+- `axi-on-ucie-to-mem`: AXI4-Lite transported over an AXI-over-UCIe (AoU) link to an AXI-Lite memory, cross-checked in five DV environments. Stack: Verilog, cocotb/PyUVM, Icarus, Verilator, SystemC, UVM. State: `main`, clean except untracked `docs/SCAN_ISSUES.md`. Plan: `docs/PLAN.md`.
+- `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc, optional VCS/UVM DV. State: `main`, clean except untracked `doc/REFERENCE_SWARM_AUDIT.md`. Plan: `doc/FULL_FUNCTIONALITY_PLAN.md`.
+- `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, integration + **`vlate_bench`** Verilator TB, optional **`uvm_bench`** VCS/UVM, Pandoc/XeLaTeX PDFs. State: `rtl/req-data-sequencing`, dirty. Plan: `docs/PLAN.md`.
 - `chi-to-cxl-bridge`: CHI to CXL.mem bridge RTL (compact 64-bit protocol abstraction). Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys, cocotb. State: `main`, dirty. Plan: `doc/PLAN.md`.
 - `chi-to-ucie-bridge`: CHI to UCIe adapter-link bridge (Phase 1 RTL scaffold + UVM TB underway). Stack: Verilog/SystemVerilog, Icarus, Verilator, UVM. State: `master`, clean. Plan: `doc/PLAN.md`.
-- `chipyard`: Upstream Berkeley UCB-BAR Chipyard SoC framework (Chisel, Rocket Chip, BOOM, FireSim, Hammer). Stack: Chisel/Scala, sbt, mill, Verilator. State: `main`, dirty. Plan: upstream (no local plan).
+- `chipyard`: Upstream Berkeley UCB-BAR Chipyard SoC framework (Chisel, Rocket Chip, BOOM, FireSim, Hammer). Stack: Chisel/Scala, sbt, mill, Verilator. State: `main`, dirty, behind 30 of `origin/main`. Plan: upstream (no local plan).
 - `chisel-playground`: Chisel project template / starter (post-Chisel-Bootcamp). Stack: Chisel3, Mill/SBT, Verilator, JDK 11+. State: `master`, clean except untracked `.github/`, `.gitignore`, and 20 more. Plan: upstream (no local plan).
 - `cxl_lpddr5x_bridge`: CXL.mem to LPDDR5X bridge RTL. Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys, cocotb. State: `main`, clean. Plan: `doc/PLAN.md`.
 - `pc-wsl-github-starter`: WSL + GitHub starter workflow. Stack: Python, Typer, pytest, GitHub Actions. State: `main`, clean. Plan: `docs/PLAN.md`.
 - `riscv_test_asm_qemu`: RISC-V cross-compile and QEMU experiments. Stack: RISC-V GNU toolchain, QEMU. State: `master`, clean. Plan: `docs/PLAN.md`.
 - `si5_prep`: AXI4-Lite slave RTL + full UVM TB (interview prep). Stack: SystemVerilog, UVM, Xcelium/Questa/VCS, Icarus, Verilator, JasperGold/VC Formal. State: `main`, clean. Plan: `PLAN.md`.
 - `snn-crossbar-model`: Spiking neural network crossbar model. Stack: Python, PyTorch, C++, SystemC, Verilog, pytest. State: `main`, clean except untracked `NOTES`. Plan: `doc/roadmap.md`.
-- `tilelink_to_AXI4`: TileLink → AXI4/AXI4-Lite + TL-C bridges in Chisel (TLCToCHI Issue-E in progress). Stack: Chisel, Verilator C++ TB, SymbiYosys, cocotb. State: `main`, clean. Plan: `doc/PLAN.md` (+ `doc/CHI_PLAN.md`).
+- `tilelink_to_AXI4`: TileLink → AXI4/AXI4-Lite + TL-C bridges in Chisel (TLCToCHI Issue-E in progress). Stack: Chisel, Verilator C++ TB, SymbiYosys, cocotb. State: `main`, dirty. Plan: `doc/PLAN.md` (+ `doc/CHI_PLAN.md`).
 - `ucie-cxl-bridge`: UCIe to CXL bridge RTL (Phases 1–6). Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys. State: `main`, clean. Plan: `doc/PLAN.md`.
+- `ucie_rdi_to_pcie6_pipe7`: UCIe 1.0 RDI ↔ PCIe 6.x / PIPE 7.1 MAC-facing bridge IP (Gen5 + Gen6). Stack: SystemVerilog, Icarus, Verilator. State: `main`, clean. Plan: `PLAN.md` (+ `docs/verification_plan.md`).
+- `uvm_review`: APB byte-wide 32K memory (`apb_mem`) RTL + PyUVM testbench with a license-gated SystemVerilog UVM mirror. Stack: Verilog, cocotb/PyUVM, SystemVerilog UVM, Icarus, Verilator. State: `main`, clean. Plan: `NOTES.md` (no PLAN.md).
 
 ## Repository notes
 
@@ -38,8 +43,8 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 
 - Purpose: AXI to 2× APB4 bridge RTL with self-checking testbenches.
 - Highlights: separate simple and burst bridge variants, APB read wait-state test sweeps (`make test-simple-ws-sweep`), bridge design contract in `doc/design_contract.md`, UVM README maps / PDF-oriented trees, **`readme-md-pdfs`** Make target.
-- Current state: `main` aligned with `origin/main`; **untracked** `sim_regblock` locally.
-- Last commit: `544e170` — "feat: add AXI3-Lite 32×32 register block with full verification stack".
+- Current state: `main` aligned with `origin/main`; **dirty** (7 uncommitted change(s)); **untracked** `.github/workflows/verilator-sim.yml`, `uvm/vlt/` locally.
+- Last commit: `e0bf6ed` — "Merge PR #1: burst WLAST fix, PyUVM TB, coverage/perf tooling, docs".
 - **Plan (`doc/PLAN.md`):** Near-term — UVM sequence/scoreboard closure, negative protocol-error tests, `make ci` + GitHub Actions gate. Medium-term — SymbiYosys formal (APB4 handshake + AXI ordering + no-deadlock), burst-length sweep, dual-slave stress. Long-term — AXI4 QoS/ID tagging, APB3 compatibility mode, synthesis flow.
 
 ### `IP-ucie-rdi-to-pcie-pipe`
@@ -48,7 +53,7 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - Highlights: dual-clock CDC with Gray-code pointer synchronization, per-lane elastic FIFOs, CRC32, CDC assertion monitors, self-checking scoreboard, Verilator coverage CI, FIFO stress verification plan, NUM_LANES=1 smoke test, reusable IP v1.0.0 baseline tag, enhanced UVM docs + PDF formatting.
 - Notes: canonical RTL lives at the repo root; `src/` and `test/` subdirectories contain thin `` `include `` wrappers for EDA tools that prefer that layout. `make verilator` and `make lint` compile the root files directly.
 - Current state: clean working tree on `main`.
-- Last commit: `fed56ce` — "dv: add SymbiYosys formal and CI/Makefile alignment".
+- Last commit: `b16e18c` — "Complete UVM PIPE backpressure closure (item 3): TX FIFO-full".
 - **Plan (`docs/verification_plan.md`):** Near-term — UVM functional coverage groups, PIPE backpressure agent, RX-path scoreboard, CRC-in-UVM. Medium-term — formal async FIFO invariants + handshake properties (SymbiYosys). Long-term — PIPE valid⇒data hold RTL + monitor policy if integrators require it.
 
 ### `MiT_capstone_beetle_kill`
@@ -59,20 +64,44 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - Last commit: `f844e8b` — "docs: add development plan (PR curves, ONNX export, augmentation, CLI)".
 - **Plan (`docs/PLAN.md`):** Near-term — PR curve output + AP per class, confusion matrix + per-image drill-down, reproducible dataset splits (seed + manifest), ONNX export. Medium-term — data augmentation pipeline, backbone comparison (MobileNetV3 / ResNet34), threshold/NMS grid-search, inference CLI (argparse/Typer). Long-term — dataset expansion, semi-supervised labeling, tile-based inference, web demo, edge deployment.
 
+### `apb-to-mem-all-py`
+
+- Purpose: APB byte-wide 32K memory RTL with a self-checking PyUVM testbench, driven entirely by **pytest** instead of GNU Make — a derivative of `uvm_review` with the same RTL and cocotb/PyUVM bench.
+- Highlights: pytest tests call cocotb's Python runner API directly, with pytest markers standing in for the old make targets; same low-power / lint / coverage / UVM deliverables; `docs/TUTORIAL.md` hands-on walkthrough (with an "add your own test" example); `CLAUDE.md` agent orientation.
+- Current state: clean working tree on `main`.
+- Last commit: `d4ddba0` — "Merge pull request #3 from markrthomas/chore/gitignore-notes".
+- **Plan:** no `PLAN.md`; see `docs/TUTORIAL.md` for the intended flow and extension points.
+
+### `apb-to-mem-bazel`
+
+- Purpose: APB byte-wide 32K memory RTL with a self-checking PyUVM testbench, driven by **Bazel** instead of GNU Make — a derivative of `uvm_review` with the same RTL and cocotb/PyUVM bench.
+- Highlights: custom Starlark test rules drive cocotb's Python runner, with `test_suite`s + tags standing in for make targets and every test exporting a JSON result; `docs/TUTORIAL.md` walkthrough for the Bazel gates; `CLAUDE.md` agent orientation.
+- Current state: `wave-launch-gtkwave`; **dirty** (3 uncommitted change(s)).
+- Last commit: `c4569a7` — "Merge pull request #5 from markrthomas/fix-make-wave".
+- **Plan:** no `PLAN.md`; see `docs/TUTORIAL.md` for the intended flow and extension points.
+
+### `axi-on-ucie-to-mem`
+
+- Purpose: AXI4-Lite transported over an **AXI-over-UCIe (AoU)** link (modeled UCIe streaming/FDI) to a far-side AXI4-Lite SRAM memory. Sibling project to `uvm_review`.
+- Highlights: verified in **five DV environments** — cocotb + PyUVM, Icarus, Verilator, SystemC, and a license-gated SystemVerilog UVM mirror — all cross-checking the same design against the same reference-memory model; AoU Basic Profile message set; digital-only OSS toolchain; GitHub Actions CI.
+- Current state: `main` aligned with `origin/main`; **untracked** `docs/SCAN_ISSUES.md` locally.
+- Last commit: `0318333` — "chore: reset SWARM_PLAN to draft (F3 metrics DB + dashboard landed in #36) (#37)".
+- **Plan (`docs/PLAN.md`):** builds the RTL plus the five DV environments over the AoU link; see the plan for phase breakdown and the swarm task contracts.
+
 ### `axi4_to_dfi_ddr`
 
 - Purpose: AXI4 slave to JEDEC DFI-style bridge for a DDR PHY / memory-controller path.
 - Highlights: gray-code async FIFOs for CDC, open-page SDRAM scheduler with per-bank PRE/ACT/CAS timing (`MC_T_RP`, `MC_T_RCD`, `MC_T_RAS`, `MC_T_WR`), optional refresh walk, AXI SLVERR error paths, elaboration-time parameter checks, Verilator lint, Yosys synthesis/formal hooks, generated PDF/HTML design spec, full-functionality roadmap (`doc/FULL_FUNCTIONALITY_PLAN.md`), **UVM DV environment for VCS**.
-- Current state: clean working tree on `main`.
-- Last commit: `06a4805` — "dv: add coverage harness, migrate formal to SymbiYosys, CI alignment".
+- Current state: `main` aligned with `origin/main`; **untracked** `doc/REFERENCE_SWARM_AUDIT.md` locally.
+- Last commit: `3687573` — "swarm: add issue-driven task contracts".
 - **Plan (`doc/FULL_FUNCTIONALITY_PLAN.md`):** Phase 1 (active) — CDC and response-ordering hardening (FIFO formal, SLVERR queue, second-simulator). Phase 2 — module split (AXI front-end, CDC queues, scheduler, DFI adapter). Phase 3 — AXI feature completion (INCR bursts, narrow/unaligned, FIXED/WRAP). Phase 4 — JEDEC scheduling (tRFC, tRRD, tFAW, bank-group, REF). Phase 5 — DFI fidelity (phase lanes, update/LP handshakes). Phase 6 — verification infrastructure (SVAs, randomized seeds, coverage). Phase 7 — synthesis and integration readiness.
 
 ### `chi-to-bow-bridge`
 
 - Purpose: starter CHI-to-BoW bridge that packetizes simplified CHI requests into BoW flits and reconstructs responses.
 - Highlights: Cocotb + Icarus unit/integration flows; integration top with reference BFM; OSS **`vlate_bench/`** Verilator + C++ parity TB (lint/run/coverage hooks); optional **`uvm_bench/`** Synopsys VCS / UVM bench with onboarding/quickref PDFs; integration protocol checker bind coverage across flows; BoW RX inject path + unknown-txn **`RSP_HDR`** parity; OSS regression Makefile targets; Markdown→PDF via Pandoc **XeLaTeX** + **DejaVu** (`docs/pandoc-pdf-defaults.yaml`, `docs/pandoc-pdf-header.tex`).
-- Current state: clean working tree on `main`.
-- Last commit: `a94e0e7` — "Implement duplicate, orphan, and illegal response header integration scenarios under Cocotb and Verilator (#23)".
+- Current state: `rtl/req-data-sequencing`; **dirty** (11 uncommitted change(s)).
+- Last commit: `ee2ae21` — "dv: add UVM parity for dup/orphan/illegal BoW RSP inject scenarios".
 - **Plan (`docs/PLAN.md`):** Near-term — deeper integration error-path via `bow_inj_*` (dup/orphan payloads), machine-readable golden-payload header export. Medium-term — CHI fidelity (split REQ/RSP/DAT channels), distinct write-data beats per REQ_DATA, QoS/fairness arbiter. Long-term — industry BoW/CHI compliance suites, performance modeling (throughput vs FIFO depth), power-aware link assumptions.
 
 ### `chi-to-cxl-bridge`
@@ -88,14 +117,14 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - Purpose: experimental CHI Request-Node ↔ UCIe adapter-link bridge — translates CHI requests to checksum-protected UCIe adapter headers (and optional data) and returns UCIe completions as CHI `Comp` / `CompData` responses.
 - Highlights: Phase 1 RTL scaffold with `chi_to_ucie_bridge.v` top, dual-clock CDC FIFOs / 2-flop synchronizers, reset + link-drain gating, checksum-protected UCIe headers, self-checking directed testbench. UVM testbench foundation in progress (generic agents/drivers/items under `verification/uvm/`).
 - Current state: clean working tree on `master`.
-- Last commit: `fe2a189` — "Coverage: add coverage-report and coverage-html Makefile targets".
+- Last commit: `3bdfa16` — "Docs: add Phase 12 section to PLAN.md".
 - **Plan (`doc/PLAN.md`):** Near-term — finish UVM agents/sequences, integrate scoreboard, baseline coverage. Medium-term — bit-closer UCIe adapter modeling, formal CDC / handshake properties, multi-lane scaling. Long-term — full UCIe wire-shape fidelity, end-to-end CHI-UCIe-CHI loopback in a sysmodel.
 
 ### `chipyard`
 
 - Purpose: local clone of the upstream Berkeley UCB-BAR **Chipyard** Chisel-based SoC framework (Rocket Chip, BOOM, CVA6, Gemmini/NVDLA accelerators, FireSim, Hammer VLSI flow, FireMarshal).
 - Highlights: large upstream tree — reference for RISC-V SoC bring-up and Chisel patterns. Workspace install state: paused at step 5 (sbt pre-compile), awaiting WSL2 RAM bump; `conda-reqs/chipyard-base.yaml` locally edited to sysroot 2.35.
-- Current state: `main` aligned with `origin/main`; **dirty** (7 uncommitted change(s)); **untracked** `conda-reqs/chipyard-base.yaml.bak` locally.
+- Current state: `main` behind 30 of `origin/main`; **dirty** (7 uncommitted change(s)); **untracked** `conda-reqs/chipyard-base.yaml.bak` locally.
 - Last commit: `48f904ae` — "fix: firechip CTCFireSimConfig to match new CTC changes (#2333)".
 - **Plan:** upstream-managed; no local PLAN.md. Local task: complete sbt pre-compile and continue Chipyard install once WSL2 RAM is bumped.
 
@@ -112,7 +141,7 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - Purpose: bridge RTL translating CXL.mem (M2S/S2M) traffic to an LPDDR5X-style memory interface with credit-based flow control and clock-domain crossing.
 - Highlights: `async_fifo` Gray-pointer CDC, `credit_counter` / `credit_pulse_sync` flow control, `reset_sync` / `reset_drain` reset handling, per-message CRC validation with bad-CRC reject; OSS DV stack — Icarus self-checking directed TB (opcodes, error injection, 1:1/2:1/1:3 clock ratios, backpressure stress), 12 cocotb UVM-equivalent tests, SymbiYosys BMC+cover on `credit_counter` / `reset_drain` / bridge top (6/6 PASS), Verilator C++ coverage harness at 96.9% line coverage, concurrent SVA on all four valid/ready interfaces (Verilator `--assert` + proven in formal); root `Makefile` (`lint/sim/regress/coverage/sva/formal/ci`) + `.github/workflows/ci.yml`.
 - Current state: clean working tree on `main`.
-- Last commit: `9051c66` — "ci: add advisory Verible style-lint job + CI hygiene [plan: Verible lint + format]".
+- Last commit: `997bde7` — "perf: FR-FCFS reordering + read-priority write buffer in LPDDR5X model [plan: perf-model FR-FCFS/write-buffer]".
 - **Plan (`doc/PLAN.md`):** Near-term — close the residual ~3% coverage (defensive default branches), extended bad-CRC / credit-underflow negatives. Medium-term — raise bridge BMC depth past 16 via k-induction, populate the VCS UVM bench. Long-term — LPDDR5X bank/timing scheduler model, synthesis/timing hooks, Pandoc design-spec PDF.
 
 ### `pc-wsl-github-starter`
@@ -151,7 +180,7 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 
 - Purpose: TileLink → AXI4 / AXI4-Lite / TL-C → CHI bridges, written in Chisel and verified with a Verilator C++ testbench, SymbiYosys formal proofs, and cocotb.
 - Highlights: **TLUHToAXI4** (TL-UH → AXI4 master; `Get`/`PutFullData`/`PutPartialData`/`Hint`/`ArithmeticData`/`LogicalData`; up to 64-byte bursts on a 64-bit data path; `source` → AXI ID); **TLULToAXILite** (TL-UL → AXI4-Lite control-plane bridge, single-beat 32/64-bit); **TLUCToAXI4** (TL-C wire shape without coherence; full TL-UH set + `AcquireBlock`/`AcquirePerm`/`Release`/`ReleaseData`, grants Tip on Acquire, TL-B tied off); **TLCToCHI** in progress — Stage 1 of 7 landed (CHI Issue-E RN-F coherent path, snoops, dirty writeback, GrantAck). CI pinned to OSS CAD Suite **2026-04-13** (Verilator 5.047).
-- Current state: clean working tree on `main`.
+- Current state: `main` aligned with `origin/main`; **dirty** (3 uncommitted change(s)); **untracked** `build_decoder/`, `test/cpp/tb_decoder.cpp`, `verification/formal/tldecoder.sby`, `verification/formal/tldecoder/`, and 2 more locally.
 - Last commit: `0df231a` — "CI: pin OSS CAD Suite to 2026-04-13 (Verilator 5.047)".
 - **Plan (`doc/PLAN.md` + `doc/CHI_PLAN.md`):** Near-term — TLCToCHI Stage 2 functional behavior (Acquire/Probe/Grant flows past the skeleton), formal coverage on the three completed bridges. Medium-term — TLCToCHI Stages 3–7 (snoop pipeline, dirty writeback, GrantAck flow, multi-core soak). Long-term — performance modeling (throughput vs FIFO depth), gate-level co-simulation, integration with a Chipyard / Rocket-Chip top.
 
@@ -160,14 +189,34 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - Purpose: experimental UCIe Adapter Layer to CXL.io / CXL.cache / CXL.mem bridge.
 - Highlights: six completed phases — Phase 1 typed 64-bit packet model and CXL.io ↔ UCIe translation; Phase 2 full packet taxonomy (CXL.io / CXL.mem / CXL.cache + completions) with XOR checksum; Phase 3 per-direction credit counters, posted/non-posted ordering split with posted-priority arbiter; Phase 4 `reset_drain` link-state FSM; Phase 5 dual-clock async FIFO architecture; Phase 6 granular protocol opcodes + integrated cross-domain credit counters. Verilator lint clean; SymbiYosys formal on sync_fifo, reset_drain, and bridge top.
 - Current state: clean working tree on `main`.
-- Last commit: `e94e227` — "dv: add Verilator coverage harness and CI alignment".
+- Last commit: `535bcbf` — "Phase 9: external credit-advertisement handshake".
 - **Plan (`doc/PLAN.md`):** Phase 7 — multi-beat payload transport (payload FIFO, arbiter sequencing, formal payload safety). Phase 8 — UVM constrained-random closure (active CXL driver, scoreboard, 95% functional coverage). Phase 9 — credit advertisement protocol (external grant/return handshake, credit-safety formal property). Near-term backlog — payload FIFO formal property file, UVM scoreboard wiring, CI directed-test GitHub Actions job, opcode decode unit test.
+
+### `ucie_rdi_to_pcie6_pipe7`
+
+- Purpose: UCIe 1.0 RDI ↔ **PCIe 6.x / PIPE 7.1 MAC-facing** bridge IP (Gen5 + Gen6) — the bridge plays the MAC/controller role and talks to a PIPE PHY over the SerDes Architecture async interface (8-bit M2P/P2M message bus). Ground-up successor to an earlier UCIe-RDI-to-generic-stub CDC bridge.
+- Highlights: real PIPE 7.1 MAC-facing downstream port; **Gen5 (32 GT/s, 128b/130b)** and **Gen6 (64 GT/s, PAM4 FLIT)** support; phased closure plan executed one numbered item per commit; Item 0 spec cross-check reconciled placeholder constants against the controlled Intel PIPE 7.1 spec; integrated IP complete (cores items 1–15 + integration).
+- Current state: clean working tree on `main`.
+- Last commit: `6cde3ac` — "ci: inline OSS CAD Suite retry per job (fix degraded wretry lifecycle)".
+- **Plan (`PLAN.md` + `docs/verification_plan.md`):** portable phased blueprint (one item per commit) driving the Gen5/Gen6 MAC-facing bridge to closure; verification plan covers the DV strategy.
+
+### `uvm_review`
+
+- Purpose: `apb_mem` — a zero-wait-state APB3 slave wrapping a byte-wide 32K memory array, with a self-checking PyUVM testbench (runnable here) and a mirror SystemVerilog UVM testbench (license-gated). Origin project for the `apb-to-mem-*` derivatives.
+- Highlights: `PREADY` tied high (single-cycle ACCESS-phase transfers), `PSLVERR` tied low, reset-gated writes, all-zero power-up array; PyUVM cocotb bench plus SV UVM mirror; low-power (UPF / IEEE 1801 example), lint, and coverage deliverables; GitHub Actions CI.
+- Current state: clean working tree on `main`.
+- Last commit: `4dba62b` — "lp: add UPF (IEEE 1801) low-power example with runnable emulation".
+- **Plan:** no `PLAN.md`; the `README.md` and `NOTES.md` document the RTL contract and DV deliverables.
 
 ## Overall observations
 
-- Most of the sixteen repositories are hardware / verification projects: Verilog/SystemVerilog RTL bridges (AXI, APB, CHI, CXL, UCIe, BoW, LPDDR5X, DFI/DDR, PCIe PIPE, AXI4-Lite slave), Chisel-based TileLink ↔ AXI / TL-C ↔ CHI bridges, the upstream Berkeley **Chipyard** SoC framework, a **Chisel** starter template, and a spiking neural network with four-way RTL cross-check.
+- Most of the twenty-one repositories are hardware / verification projects: Verilog/SystemVerilog RTL bridges (AXI, APB, CHI, CXL, UCIe, BoW, LPDDR5X, DFI/DDR, PCIe PIPE, AXI4-Lite slave), an AXI-over-UCIe link to memory with five cross-checking DV environments, pytest- and Bazel-driven derivatives of the `apb_mem` PyUVM bench, Chisel-based TileLink ↔ AXI / TL-C ↔ CHI bridges, the upstream Berkeley **Chipyard** SoC framework, a **Chisel** starter template, and a spiking neural network with four-way RTL cross-check.
 - `MiT_capstone_beetle_kill` is the sole ML/Python project; `riscv_test_asm_qemu` is the sole bare-metal RISC-V toolchain project; `pc-wsl-github-starter` is the only pure-tooling repo.
 - Most repos track **`main`** / **`master`** in lockstep with their remotes; a few clones carry **untracked** scratch (`NOTES`, sim build dirs, UVM PDFs) — see each section.
 - **Most local repos have plan documents.** Upstream-managed repos (`chipyard`, `chisel-playground`) intentionally rely on upstream roadmaps and don't carry a local `PLAN.md`.
 - **Workspace PDF**: this summary's **`make pdf`** uses the same **XeLaTeX + DejaVu** stack as **`chi-to-bow-bridge`** (`.pandoc-pdf-defaults.yaml` + `.pandoc-header.tex`).
 - **Default `make` target** is `update-readme`, which regenerates this file's dynamic facts (repo count, inspected-on date, per-repo `State`, `Current state`, and `Last commit`) from `git`. Hand-curated prose (Purpose / Highlights / Plan) is left untouched.
+
+## Toolchain notes
+
+- **OSS UVM-on-Verilator stack** (outside `~/proj`, shared by all repos): the newest Verilator that supports UVM is built in **`~/verilator`** — **Verilator 5.050** (rev `v5.050-60-g3d2421f3b`, 2026-07-01; upstream `verilator/verilator`). It pairs with the Accellera UVM library in **`~/uvm-verilator`** — **UVM (IEEE 1800.2-2020) kit 2020.3.2** (`uvm-2020-3.2-17-g5d72b66`; upstream `chipsalliance/uvm-verilator`). Together these give an open-source path for the SystemVerilog UVM benches that otherwise require a license-gated simulator (e.g. the UVM mirrors in `uvm_review`, `axi-on-ucie-to-mem`, `si5_prep`, and the `uvm_bench` in `chi-to-bow-bridge`). Invoke Verilator from `~/verilator/bin` with `VERILATOR_ROOT` left unset (do not point it at the OSS CAD Suite copy).
