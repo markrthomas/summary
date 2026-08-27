@@ -1,5 +1,6 @@
 *
 !.gitignore
+!NOTES
 !README.md
 !Makefile
 !.pandoc-header.tex

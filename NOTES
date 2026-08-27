@@ -1,0 +1,47 @@
+# Session Restart Notes
+
+_Purpose: if the WSL session dies (OOM during UVM/Verilator builds), read this first to get back up to speed fast. Updated periodically by Claude._
+
+Last updated: 2026-08-27
+
+## Current task
+Getting SystemVerilog UVM benches to run under the OSS Verilator stack
+(~/verilator 5.050 + ~/uvm-verilator). The session keeps dying: UVM+Verilator
+builds OOM the whole WSL VM.
+
+## Root causes (confirmed this session)
+1. **Stale VERILATOR_ROOT.** Sourcing ~/oss-cad-suite/environment exports
+   VERILATOR_ROOT=/home/markt/oss-cad-suite/share/verilator. That makes
+   ~/verilator/bin/verilator hard-error ("inconsistent path"). FIX: `unset
+   VERILATOR_ROOT` AFTER sourcing the OSS CAD Suite env. Then
+   ~/verilator/bin/verilator = 5.050 works (verified).
+2. **RAM ceiling is ~5.7 GB, not 16 GB.** .wslconfig says memory=16GB but
+   MemTotal is 5.9 GB. WSL2 defaults to ~50% of host -> host is ~8 GB physical.
+   memory=16GB CANNOT be honored on an 8 GB machine (silently ignored). This is
+   why the "WSL2 RAM bump" (chipyard) never took. Swap = 8 GB on /dev/sdc.
+   nproc = 12.
+3. **UVM-on-Verilator build OOMs** because default build fans out to
+   --build-jobs / make -j across 12 cores with g++ -O2; a dozen cc1plus at
+   1-2 GB each blows past 5.7 GB + swap and WSL kills the VM (no dmesg trace).
+
+## Fix strategy (fit the build to available RAM, fail alone not whole VM)
+- Serialize + de-optimize C++: `verilator --build-jobs 1 --no-threads -CFLAGS "-O0"`
+  (-O0 is the biggest peak-RAM win for Verilated UVM; -O2 is the hog).
+- Guard with per-process cap so a runaway dies with an error instead of killing
+  WSL: run build in a subshell under `ulimit -v` (~4 GB).
+- Always `--lint-only` first (near-zero RAM) before full elaborate+compile.
+- Wrap all of the above in a script (unset VERILATOR_ROOT, ~/verilator/bin first
+  on PATH, the flags above).
+
+## Key paths
+- ~/verilator/bin/verilator          -> Verilator 5.050 (only one that runs UVM)
+- ~/uvm-verilator                     -> Accellera UVM 1800.2-2020 3.2 kit
+- ~/oss-cad-suite                     -> OSS CAD Suite (its Verilator does NOT run UVM)
+- UVM benches: ~/proj/*/uvm , chi-to-bow-bridge/uvm_bench (VCS),
+  chi-to-bow-bridge/vlate_bench (C++ TB, not UVM)
+- No committed UVM+Verilator build script found yet (stack set up 2026-08-27);
+  build was likely being assembled by hand.
+
+## Next step when resuming
+Identify which bench was being built, write the memory-bounded wrapper script,
+run --lint-only first, then a single controlled --build-jobs 1 -O0 compile.
