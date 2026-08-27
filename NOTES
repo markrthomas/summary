@@ -75,8 +75,16 @@ Last updated: 2026-08-27 (lint milestone added)
   bridge_uvm_env_pkg (exclude covergroup under Verilator), bridge_rand_stim/
   bridge_scoreboard/bridge_uvm_tests_pkg (cast/factory/vif fixes). Working tree
   now CLEAN. The uvm/vlt flow + CI + port are all landed together now.
-- RUN 3 (33113536250, head 127a8d1) in flight. Watching via bg bq2w7frix. Lint
-  should pass now; next real unknown = the --binary smoke build (make simple).
+- RUN 3 (33113536250, head 127a8d1) = SUCCESS (8m36s). GREEN END-TO-END:
+  * lint: all 5 tops pass (~330 MB, ~4.6s each).
+  * --binary smoke build (tb_uvm_simple): 2677 C++ files, peak 339 MB, 76s build
+    on 4 threads — the exact step that OOMed the 8 GB WSL box; trivial on runner.
+  * UVM run: "SIMPLE TEST PASSED", scoreboard axi_wr=2 axi_rd=2 apb0=2 apb1=2
+    mism=0, UVM_ERROR=0 UVM_FATAL=0.
+  => OSS UVM-on-Verilator proven in cloud CI; local OOM fully sidestepped. DONE.
+  Remaining optional: extend CI beyond `simple` to burst/burst_ext/parameterized/
+  regblock; fix the repeated Verilator cache miss (speed only); ultrareview the
+  branch; the cosmetic randomize()/width warnings.
 
 
 
