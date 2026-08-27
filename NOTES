@@ -2,7 +2,26 @@
 
 _Purpose: if the WSL session dies (OOM during UVM/Verilator builds), read this first to get back up to speed fast. Updated periodically by Claude._
 
-Last updated: 2026-08-27
+Last updated: 2026-08-27 (lint milestone added)
+
+## PROGRESS (2026-08-27)
+- Target bench identified: IP-axi-to-2apbs/uvm/vlt (own git repo,
+  github.com/markrthomas/IP-axi-to-2apbs). Well-formed Verilator UVM Makefile
+  already there; BUILD_JOBS=1 and --CFLAGS -O0 are the RAM-safe defaults.
+- UVM_HOME = /home/markt/verilator/test_regress/t/uvm  (has
+  uvm_pkg_all_v2020_3_1_dpi.svh and v2020_3_1/dpi/uvm_dpi.cc).
+- LINT-ONLY PASSES: with VERILATOR_ROOT unset + ~/verilator/bin/verilator,
+  `--lint-only --timing` on tb_uvm_simple = exit 0, peak RSS 331 MB, 5.6 s.
+  Front-end (elaborate) is cheap and clean. Only warning: WIDTHEXPAND at
+  sv/pkg/bridge_uvm_tests_pkg.sv:434 (n_txn+64, 32-bit LHS in longint' expr;
+  cosmetic).
+- CONCLUSION: OOM is 100% the `--binary` g++ step (2463 generated C++ files).
+  Lint = 331 MB; the C++ compile = GBs. Do that step on a bigger-RAM host, or
+  a slow BUILD_JOBS=1 run under swap. DO NOT run the full build in-session.
+- Reusable guarded lint one-liner lives in shell history; consider adding a
+  `lint` target to uvm/vlt/Makefile (separate repo — not committed yet).
+
+
 
 ## Current task
 Getting SystemVerilog UVM benches to run under the OSS Verilator stack
