@@ -57,6 +57,17 @@ Last updated: 2026-08-27 (lint milestone added)
 - NOTE: ultrareview of these IP-axi-to-2apbs changes was NOT run (the one that
   returned [] was scoped to ~/proj NOTES). Can still /code-review ultra from
   inside IP-axi-to-2apbs if desired.
+- RUN 1 (33112169828) FAILED at "Lint UVM tops": root cause = uvm/vlt/uvm_macros.svh
+  (an empty include-shim) was UNTRACKED, so fresh CI checkout couldn't find it ->
+  11 cascading parse errors. Local lint-simple had passed only because the
+  untracked file was in my tree. Verilator 5.050 built fine from source; CI
+  toolchain is correct.
+- FIX (272208b, pushed): track uvm/vlt/uvm_macros.svh + add uvm/vlt/.gitignore
+  (obj/). Verified locally: `make lint` passes ALL 5 tops (simple/burst/
+  burst_ext/parameterized/regblock), exit 0, ~330 MB each.
+- RUN 2 (33112753441) in flight; Verilator now a cache HIT so it goes straight
+  to lint -> the --binary smoke build (make simple) = the real remaining unknown
+  (--binary UVM compile has never succeeded anywhere). Watching via bg b7l0al949.
 
 
 
