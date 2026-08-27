@@ -65,9 +65,18 @@ Last updated: 2026-08-27 (lint milestone added)
 - FIX (272208b, pushed): track uvm/vlt/uvm_macros.svh + add uvm/vlt/.gitignore
   (obj/). Verified locally: `make lint` passes ALL 5 tops (simple/burst/
   burst_ext/parameterized/regblock), exit 0, ~330 MB each.
-- RUN 2 (33112753441) in flight; Verilator now a cache HIT so it goes straight
-  to lint -> the --binary smoke build (make simple) = the real remaining unknown
-  (--binary UVM compile has never succeeded anywhere). Watching via bg b7l0al949.
+- RUN 2 (33112753441) FAILED at lint again — shim fixed the include error, but 9
+  REAL syntax errors remained (int unsigned'(...) two-word cast etc). ROOT CAUSE:
+  the whole UVM-on-Verilator PORT (7 modified uvm/sv files) was UNCOMMITTED. CI
+  checked out pre-port HEAD, which Verilator can't parse. Local lint passed only
+  because the WIP edits were in my working tree.
+- FIX (127a8d1, pushed): user approved committing the port as one commit. Staged
+  all 7: bridge_axi_monitor (decouple), bridge_cov_collector/bridge_env/
+  bridge_uvm_env_pkg (exclude covergroup under Verilator), bridge_rand_stim/
+  bridge_scoreboard/bridge_uvm_tests_pkg (cast/factory/vif fixes). Working tree
+  now CLEAN. The uvm/vlt flow + CI + port are all landed together now.
+- RUN 3 (33113536250, head 127a8d1) in flight. Watching via bg bq2w7frix. Lint
+  should pass now; next real unknown = the --binary smoke build (make simple).
 
 
 
