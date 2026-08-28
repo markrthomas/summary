@@ -36,6 +36,27 @@ probe 0/10 -> 10/10; apb-to-mem-all-py smoke 64 errors -> 0/0. Also added
 timeout-minutes: 30 to guard runaway hangs (axi4_dfi had hung ~3h). z3+timeout
 pushed to all 8 repos; re-running. See memory [[oss-uvm-verilator]].
 
+### FINAL CAMPAIGN STATE (2026-08-27)
+CORE 8 repos — flow+CI+z3, true-pass (UVM_ERROR 0 / UVM_FATAL 0):
+  apb-to-mem-all-py, uvm_review, apb-to-mem-bazel, ucie-cxl-bridge,
+  cxl_lpddr5x_bridge, chi-to-ucie-bridge = CONFIRMED 0/0.
+  axi-on-ucie-to-mem, axi4_to_dfi_ddr = z3 re-run in flight (cache-miss builds).
+chi-to-bow-bridge (uvm_bench): lint-clean (packed-cast fix); pushed via PR #25
+  (main is branch-protected — direct push rejected), UVM CI runs on the PR.
+DEFERRED (need structural refactor of verification source; flagged for user):
+  - si5_prep: reserved-word identifiers (checker, strong), import "DPI-C" in a
+    class, $get_coverage. (private repo created+pushed.)
+  - IP-ucie-rdi-to-pcie-pipe: circular package import (ucie_rdi_pcie_pkg <->
+    ucie_rdi_seq_lib) Verilator rejects; also a covergroup bin named 'medium'
+    (reserved charge-strength word).
+  - ucie_rdi_to_pcie6_pipe7: clocking-block-in-modport (Verilator gap) + forward
+    class references (coverage classes before their transaction decls).
+Latent bugs Verilator caught + fixed in never-run benches: endtask (cxl_lpddr5x),
+put()-in-function (chi-to-ucie), `uvm_field_time + paren-expr bit-select
+(axi4_dfi), packed cast logic[1:0]'() -> 2'() (chi-to-bow).
+Branch-protection repos need PR flow (chi-to-bow). Feature-branch repos: cherry-
+pick vlt+workflow onto default branch (did for apb-to-mem-bazel).
+
 ### (historical) THE BLOCKER (true-pass): randomize() fails under UVM on Verilator
 Real UVM results (build+run OK, but tests do not pass):
 | repo | UVM_ERROR | UVM_FATAL |
