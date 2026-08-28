@@ -27,7 +27,16 @@ UVM_ERRORs, so "success" did NOT mean the smoke test passed. Real status below.
   DEFERRED: reserved-word identifiers used as names (checker, strong),
   import "DPI-C" inside a class, $get_coverage — needs refactor/guards.
 
-### THE BLOCKER (true-pass): randomize() fails under UVM on Verilator
+### ROOT CAUSE FOUND + FIXED (2026-08-27): z3 solver missing in CI
+Verilator solves randomize() constraints via an external SMT solver (z3/cvc5)
+at RUNTIME. GitHub runners have none -> every constrained randomize() returns 0
+-> mass UVM_ERRORs. Local works because z3/cvc5 are on PATH (~/oss-cad-suite/bin).
+FIX = `apt-get install -y z3` in each verilator-uvm.yml (next to ccache). Proven:
+probe 0/10 -> 10/10; apb-to-mem-all-py smoke 64 errors -> 0/0. Also added
+timeout-minutes: 30 to guard runaway hangs (axi4_dfi had hung ~3h). z3+timeout
+pushed to all 8 repos; re-running. See memory [[oss-uvm-verilator]].
+
+### (historical) THE BLOCKER (true-pass): randomize() fails under UVM on Verilator
 Real UVM results (build+run OK, but tests do not pass):
 | repo | UVM_ERROR | UVM_FATAL |
 |------|-----------|-----------|
