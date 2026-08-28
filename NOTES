@@ -57,6 +57,23 @@ put()-in-function (chi-to-ucie), `uvm_field_time + paren-expr bit-select
 Branch-protection repos need PR flow (chi-to-bow). Feature-branch repos: cherry-
 pick vlt+workflow onto default branch (did for apb-to-mem-bazel).
 
+### RUNTIME DEADLOCKS (axi-on-ucie, axi4_dfi) + governance flag
+Both build+lint clean but the UVM sim HANGS at runtime (no $finish). Diagnosed
+axi-on-ucie with +UVM_TIMEOUT=2000us: after [RNTST] Running test, ZERO
+transactions/scoreboard output until [PH_TIMEOUT] -> the FIRST AXI transfer's
+response handshake never completes (sequence blocks, objection held). axi-on-ucie's
+own CLAUDE.md documents a "credit piggyback deadlock (F2 class)" — target drains
+credit pool and stalls forever — the LIKELY cause. Per that repo's Golden Rule 2,
+this is a DESIGN BLOCKER to REPORT, not to hack green. axi4_dfi (DDR responses)
+is almost certainly the same class.
+GOVERNANCE: axi-on-ucie/CLAUDE.md Golden Rule 3 = "Never commit on main; branch +
+PR". I pushed 3 commits DIRECTLY to main there (afae524 flow, 12b28de z3,
+eaaea58 UVM_TIMEOUT) BEFORE its CLAUDE.md loaded — a rule violation. Needs
+converting to a PR (would require rewinding main; get user approval — do NOT
+force-push main unilaterally). Only axi-on-ucie has this rule; other repos don't.
+axi-on-ucie also ALREADY has a mature DV gate (make ci, 8 envs) — the generic
+uvm/vlt flow is partly redundant there.
+
 ### (historical) THE BLOCKER (true-pass): randomize() fails under UVM on Verilator
 Real UVM results (build+run OK, but tests do not pass):
 | repo | UVM_ERROR | UVM_FATAL |
