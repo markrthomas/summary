@@ -1,6 +1,7 @@
 *
 !.gitignore
 !NOTES
+!CLAUDE.md
 !README.md
 !Makefile
 !.pandoc-header.tex
