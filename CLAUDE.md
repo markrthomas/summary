@@ -21,3 +21,7 @@ files). Repo-specific guidance lives in each repo's own CLAUDE.md.
   not verify end to end (e.g. a toolchain unavailable in your environment),
   CI that is red or was not run, or a reviewer who asked for changes. Say
   why in the PR and to the user.
+  If the session cannot delete branches (e.g. the git proxy rejects ref
+  deletion with 403), list the leftover branches for the user instead of
+  silently skipping; enabling GitHub's per-repo "Automatically delete head
+  branches" setting makes the delete step happen on merge.
