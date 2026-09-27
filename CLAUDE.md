@@ -10,3 +10,18 @@ files). Repo-specific guidance lives in each repo's own CLAUDE.md.
   a branch and open a PR in any repo in this workspace, create it with
   "Ready for review" (draft = false). Only open a draft if the user asks for
   one or the work is explicitly unfinished; say so in the PR body if you do.
+- **Finish what you open: review, merge, delete the branch.** For branches
+  and PRs you create in this workspace, don't stop at "PR opened". Once CI is
+  green and there are no merge conflicts or open review threads, review the
+  full diff yourself (correctness, scope, no stray or generated files, docs and
+  help text in sync), then merge the PR and delete its branch (remote and
+  local). Stop and leave the PR open for the user instead when there is a high
+  probability of a mistake. That covers RTL/DUT behaviour changes, changes
+  to what a regression checks or its default stimulus, anything you could
+  not verify end to end (e.g. a toolchain unavailable in your environment),
+  CI that is red or was not run, or a reviewer who asked for changes. Say
+  why in the PR and to the user.
+  If the session cannot delete branches (e.g. the git proxy rejects ref
+  deletion with 403), list the leftover branches for the user instead of
+  silently skipping; enabling GitHub's per-repo "Automatically delete head
+  branches" setting makes the delete step happen on merge.
