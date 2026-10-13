@@ -1,29 +1,79 @@
 # DV Standards — RTL Workspace
 
-**Applies to:** `IP-axi-to-2apbs`, `IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`,
-`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`, `cxl_lpddr5x_bridge`
+**Applies to:** every RTL/DV repo in the workspace (the `RTL_REPOS` list in the
+root `Makefile`): `IP-axi-to-2apbs`, `IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`,
+`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`, `cxl_lpddr5x_bridge`,
+`chi-to-cxl-bridge`, `chi-to-ucie-bridge`, `ucie_rdi_to_pcie6_pipe7`, `si5_prep`,
+`axi-on-ucie-to-mem`, `ucie2-pipe7-bridge`, `eth-dj-to-pcie-pipe-bridge`,
+`eth-dj-pcie-pipe7_1-bridge`, `uvm_review`, `apb-to-mem-all-py`, `apb-to-mem-bazel`
 
 ---
 
 ## Standard Makefile targets
 
-Every RTL repo must expose these root-level targets with consistent semantics:
+Every RTL repo must expose these root-level targets with consistent semantics.
+Run `make audit` from the workspace root to check them (`dv_audit.sh` reads make's
+rule database, so a directory that merely shares a name, e.g. `formal/`, does not count).
+`make repos-<target>` from the workspace root runs one target in every repo.
 
 | Target | What it runs | Must exit 0 |
 |--------|-------------|-------------|
+| `make` (no args) | Same as `make help` — the default goal never runs a gate | Always |
+| `make help` | Print the target list | Always |
 | `make lint` | Verilator `--lint-only -Wall` on all RTL modules | Always |
 | `make sim` | Primary directed simulation (Icarus or Verilator C++) | Always |
-| `make regress` | `lint` + `sim` — **the fast CI gate** | Always |
+| `make regress` | `lint` + `sim` (a repo may add more tiers) — **the fast CI gate** | Always |
 | `make coverage` | Verilator `--coverage` simulation + `lcov` report | Yes (or print stub message and exit 0) |
 | `make formal` | SymbiYosys BMC + cover on key modules | Yes (or print stub and exit 0) |
 | `make ci` | `regress` + `coverage` + `formal` — comprehensive local run | Always |
-| `make stress` | Stress / randomized simulation (if applicable) | Always |
+| `make stress` | Stress / randomized simulation | Yes (or print `[STRESS] n/a` stub and exit 0) |
 | `make clean` | Remove all build artifacts | Always |
 
-### Implementation status (2026-05-31 — cxl_lpddr5x_bridge DV-standardized + coverage)
+Rules:
 
-| Repo | lint | sim | regress | coverage | formal | ci | CI workflow |
-|------|------|-----|---------|----------|--------|----|-------------|
+- **Stubs, not absences.** A tier a repo does not have yet is a target that prints
+  `[<TIER>] n/a: <reason>` and exits 0. A missing target (or a bare directory with
+  the same name) is a deviation.
+- **Missing tool ≠ failure for optional tiers.** `formal` prints
+  `[FORMAL] sby not found; ...` and exits 0 when SymbiYosys is not installed;
+  `coverage` skips cleanly without Verilator. CI installs the tools, so a real
+  failure still fails there.
+- **License-gated flows are not `sim`/`regress`.** A repo whose primary bench needs a
+  commercial simulator (`si5_prep`: Xcelium) keeps that flow under its own targets
+  (`regression`, `rand_regress`, ...). `sim` runs it only when `xrun` is on PATH and
+  otherwise falls back to the license-free RTL smoke; `regress` is always license-free.
+- **Non-Make drivers.** `apb-to-mem-all-py` (pytest) and `apb-to-mem-bazel` (Bazel)
+  expose the same verbs as thin shims over their native runner.
+
+### Implementation status (2026-10-13 — target-name sweep)
+
+All 18 repos now define every standard target and default to `help`
+(`make audit` reports no target warnings). Behaviour behind each name still differs
+by repo (the aggregates are supersets of the minimum above); the points below are the
+per-repo specifics worth knowing.
+
+| Repo | `stress` is | `formal` is | Notes |
+|------|-------------|-------------|-------|
+| IP-axi-to-2apbs | `test-stress` (iverilog) | SymbiYosys | |
+| IP-ucie-rdi-to-pcie-pipe | n/a stub | SymbiYosys | default goal was `all`, now `help` |
+| axi4_to_dfi_ddr | n/a stub | SymbiYosys | |
+| chi-to-bow-bridge | n/a stub | SymbiYosys | default goal was `all` (CI now runs `make all`) |
+| ucie-cxl-bridge | directed stress | SymbiYosys, sby-guarded | |
+| tilelink_to_AXI4 | n/a stub | SymbiYosys | needs `sbt` for every tier |
+| cxl_lpddr5x_bridge | directed stress | SymbiYosys, sby-guarded | |
+| chi-to-cxl-bridge | directed stress | SymbiYosys, sby-guarded | |
+| chi-to-ucie-bridge | directed stress | SymbiYosys, sby-guarded | |
+| ucie_rdi_to_pcie6_pipe7 | n/a stub | SymbiYosys | `lint` fails on Verilator 5.020 (SVA `##[a:b]` unsupported); not re-verified on a newer one |
+| si5_prep | `iverilog_rand` | SymbiYosys, sby-guarded | gained lint/regress/coverage/ci; `coverage` is an n/a stub (Xcelium) |
+| axi-on-ucie-to-mem | `test-random` | SymbiYosys | `regress` is the heavy gate here (`ci` = `regress`) |
+| ucie2-pipe7-bridge | n/a stub | SymbiYosys | |
+| eth-dj-to-pcie-pipe-bridge | directed stress | SymbiYosys, sby-guarded | |
+| eth-dj-pcie-pipe7_1-bridge | n/a stub | n/a stub | already conformant |
+| uvm_review | `test-random` | n/a stub | `sim` was a no-op (matched `sim/` dir); now `test` |
+| apb-to-mem-all-py | `test-random` | n/a stub | pytest-driven |
+| apb-to-mem-bazel | `test-random` | n/a stub | Bazel-driven |
+
+------|------|-----|---------|----------|--------|----|-------------|
 | IP-axi-to-2apbs | ✓ | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ | ✓ coverage job |
 | IP-ucie-rdi-to-pcie-pipe | ✓ | ✓ | ✓ | ✓ alias | ✓ (SymbiYosys) | ✓ existing | ✓ existing |
 | axi4_to_dfi_ddr | ✓ alias | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ existing | ✓ coverage job |
@@ -93,6 +143,19 @@ Current deviations (tracked in TODO below):
 ---
 
 ## TODO list
+
+### Done (2026-10-13 target-name sweep)
+
+- [x] Extend scope from 5–7 repos to all 18 RTL/DV repos; `make audit` now checks
+      every standard target and the `help` default goal in each
+- [x] Add `stress` (alias to the existing random tier, else an n/a stub) and `help`
+      default goal everywhere they were missing
+- [x] `formal` no longer hard-fails (exit 127) when `sby` is absent in
+      ucie-cxl-bridge, cxl_lpddr5x_bridge, chi-to-cxl-bridge, chi-to-ucie-bridge,
+      eth-dj-to-pcie-pipe-bridge
+- [x] `si5_prep`: add lint / regress / coverage / formal / ci / stress; make `sim`
+      license-free when no Xcelium
+- [x] Root `make repos-<target>` runs any standard target across all repos
 
 ### Done (2026-05-09 alignment sweep)
 
