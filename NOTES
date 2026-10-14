@@ -3,7 +3,29 @@
 _Cross-repo notes. Repo-specific knowledge lives in each repo (CLAUDE.md,
 uvm/vlt/README.md). Updated periodically by Claude._
 
-Last updated: 2026-08-27
+Last updated: 2026-10-14
+
+## MAKE-TARGET CONSISTENCY SWEEP (2026-10-13/14) — DONE
+
+All 18 RTL/DV repos expose the DV_STANDARDS.md targets (`help lint sim regress
+coverage formal ci stress clean`) and default to `help`. 18 PRs (17 repos +
+this one), all merged with CI green on real toolchains (sby, Verilator 5.050).
+
+- `make audit` (here) checks the targets in every repo; `make repos-<target>`
+  runs one across all repos. `RTL_REPOS` in the root Makefile is the list;
+  names are the local workspace dirs from the README (newer repos use their
+  GitHub names) — a name that is not checked out is skipped, not failed.
+- Behaviour changes worth remembering: `si5_prep` `sim` runs Xcelium only if
+  `xrun` is on PATH, else a license-free smoke; `uvm_review` `sim` is now a
+  real run (`test`), it used to be a silent no-op because `sim/` the directory
+  matched; `chi-to-bow-bridge` CI runs `make all` (default goal is now `help`).
+- Trap to avoid: a directory named like a target (`formal/`, `sim/`) makes
+  `make <name>` report "up to date" and pass. Declare the target `.PHONY`.
+- Open: `cocotb` pin drift (`dv_env.mk` 1.8.1 vs 1.9.2 in one repo's CI and in
+  several CLAUDE.md files) — pick one and align. Remote branch deletion is
+  rejected by the cloud git proxy: leftover `claude/make-target-consistency`
+  branches in the merged repos need deleting by hand (or enable GitHub's
+  "Automatically delete head branches").
 
 ## UVM-on-Verilator CAMPAIGN — HONEST STATUS (2026-08-27)
 

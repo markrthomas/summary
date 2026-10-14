@@ -4,6 +4,13 @@
 
 This directory contains 21 Git repositories. The notes below reflect each repo's local `README.md`, top-level files, and Git status as inspected on **2026-08-27**.
 
+## 2026-10-13 make-target consistency sweep
+
+- **Scope:** all 18 RTL/DV repos (the `RTL_REPOS` list in the root `Makefile`) now expose the same root targets — `help`, `lint`, `sim`, `regress`, `coverage`, `formal`, `ci`, `stress`, `clean` — and bare `make` prints `help` everywhere. The contract, stub rules and per-repo status table are in **`DV_STANDARDS.md`**.
+- **What changed per repo** (one PR each, all merged; Makefile-only except one CI line): `stress` added (alias of the existing random tier, else an `[STRESS] n/a` stub); `formal` no longer exits 127 when `sby` is missing (`ucie-cxl-bridge`, `cxl_lpddr5x_bridge`, `chi-to-cxl-bridge`, `chi-to-ucie-bridge`, `eth-dj-to-pcie-pipe-bridge`); `si5_prep` gained `lint`/`regress`/`coverage`/`formal`/`ci` and a license-free `sim` fallback; `uvm_review`, `apb-to-mem-all-py` and `apb-to-mem-bazel` gained `formal` stubs (`uvm_review` also a real `sim`); `IP-ucie-rdi-to-pcie-pipe` and `chi-to-bow-bridge` default to `help` (`chi-to-bow-bridge` CI now runs `make all`).
+- **Workspace tooling:** `make audit` checks every standard target and the `help` default goal in every repo via make's rule database; `make repos-<target>` runs one standard target across all repos and lists failures (`make regress` is an alias).
+- **No RTL, testbench or existing recipe semantics changed.** Open item: `make audit` still warns about a `cocotb` pin mismatch (`dv_env.mk` pins 1.8.1; one repo's CI uses 1.9.2).
+
 ## 2026-05-09 maintenance update
 
 - Re-surveyed all nine sub-repos for newest commits, branch alignment, and working-tree noise.
@@ -21,6 +28,9 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - `apb-to-mem-all-py`: APB byte-wide 32K memory RTL + PyUVM testbench driven entirely by **pytest** (cocotb runner API). Derivative of `uvm_review`. Stack: Verilog, cocotb/PyUVM, pytest, Icarus, Verilator. State: `main`, clean. Plan: `docs/TUTORIAL.md` (no PLAN.md).
 - `apb-to-mem-bazel`: APB byte-wide 32K memory RTL + PyUVM testbench driven by **Bazel** (Starlark test rules over the cocotb runner). Derivative of `uvm_review`. Stack: Verilog, cocotb/PyUVM, Bazel/Starlark, Icarus, Verilator. State: `wave-launch-gtkwave`, dirty. Plan: `docs/TUTORIAL.md` (no PLAN.md).
 - `axi-on-ucie-to-mem`: AXI4-Lite transported over an AXI-over-UCIe (AoU) link to an AXI-Lite memory, cross-checked in five DV environments. Stack: Verilog, cocotb/PyUVM, Icarus, Verilator, SystemC, UVM. State: `main`, clean except untracked `docs/SCAN_ISSUES.md`. Plan: `docs/PLAN.md`.
+- `eth-dj-pcie-pipe7_1-bridge`: IEEE 802.3dj Ethernet MAC/PCS packet interface to PCIe PIPE 7.1 (PAM4 baseline, Gen6 FLIT) bridge; M0 scaffold with a green `make regress`. Stack: SystemVerilog, Icarus, Verilator, SystemC, cocotb/PyUVM, UVM. State: `main`. Plan: `docs/PLAN.md`.
+- `eth-dj-to-pcie-pipe-bridge`: the same 802.3dj-to-PIPE 7.1 bridge, first cut complete (M0–M7): Tx + Rx datapaths, PIPE control plane, five DV environments agreeing on a shared scenario set, CI, metrics dashboard. Stack: SystemVerilog, Icarus, Verilator, SystemC, cocotb/PyUVM, UVM, SymbiYosys. State: `main`. Plan: `docs/PLAN.md`.
+- `ucie2-pipe7-bridge`: UCIe 2.0 FDI to PCIe PIPE 7.1 MAC-facing bridge (Gen5 + Gen6), verified by two cycle-accurate testbenches (PyUVM and SV UVM-on-Verilator) with a byte-identical trace cross-check. Stack: SystemVerilog, Verilator, cocotb/PyUVM, UVM, SymbiYosys. State: `main`. Plan: `PLAN.md` (+ `docs/phase_i_design_completion.md`).
 - `axi4_to_dfi_ddr`: AXI4 to DFI / DDR bridge RTL. Stack: Verilog, Icarus, Verilator, Yosys, Pandoc, optional VCS/UVM DV. State: `main`, clean except untracked `doc/REFERENCE_SWARM_AUDIT.md`. Plan: `doc/FULL_FUNCTIONALITY_PLAN.md`.
 - `chi-to-bow-bridge`: CHI to BoW bridge starter. Stack: Verilog, Cocotb, Icarus, integration + **`vlate_bench`** Verilator TB, optional **`uvm_bench`** VCS/UVM, Pandoc/XeLaTeX PDFs. State: `rtl/req-data-sequencing`, dirty. Plan: `docs/PLAN.md`.
 - `chi-to-cxl-bridge`: CHI to CXL.mem bridge RTL (compact 64-bit protocol abstraction). Stack: Verilog/SystemVerilog, Icarus, Verilator, SymbiYosys, cocotb. State: `main`, dirty. Plan: `doc/PLAN.md`.
@@ -214,6 +224,7 @@ Prior sweep (**2026-05-06**) covered: `chi-to-bow-bridge` PR #19 (XeLaTeX/DejaVu
 - `MiT_capstone_beetle_kill` is the sole ML/Python project; `riscv_test_asm_qemu` is the sole bare-metal RISC-V toolchain project; `pc-wsl-github-starter` is the only pure-tooling repo.
 - Most repos track **`main`** / **`master`** in lockstep with their remotes; a few clones carry **untracked** scratch (`NOTES`, sim build dirs, UVM PDFs) — see each section.
 - **Most local repos have plan documents.** Upstream-managed repos (`chipyard`, `chisel-playground`) intentionally rely on upstream roadmaps and don't carry a local `PLAN.md`.
+- **Standard make targets.** Every RTL/DV repo exposes `help lint sim regress coverage formal ci stress clean`, with `help` as the default goal; tiers a repo lacks are `n/a` stubs that exit 0. Run `make audit` here to verify, or `make repos-<target>` to run one target across all repos. See `DV_STANDARDS.md`.
 - **Workspace PDF**: this summary's **`make pdf`** uses the same **XeLaTeX + DejaVu** stack as **`chi-to-bow-bridge`** (`.pandoc-pdf-defaults.yaml` + `.pandoc-header.tex`).
 - **Default `make` target** is `update-readme`, which regenerates this file's dynamic facts (repo count, inspected-on date, per-repo `State`, `Current state`, and `Last commit`) from `git`. Hand-curated prose (Purpose / Highlights / Plan) is left untouched.
 
