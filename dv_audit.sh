@@ -89,6 +89,33 @@ check_repo() {
   fi
 }
 
+
+# Standard make targets (DV_STANDARDS.md). Read from make's own rule database so
+# aliases and includes are seen as make sees them; a directory that merely shares
+# a target's name (e.g. formal/) does NOT count as the target.
+STD_TARGETS="help lint sim regress coverage formal ci stress clean"
+# Repo directory names as they appear in this workspace (same list as the root Makefile).
+RTL_REPOS=$(sed -n '/^RTL_REPOS :=/,/^$/p' "$WORKSPACE/Makefile" | sed 's/^RTL_REPOS ://; s/^=//; s/\\$//' | tr -s ' \n' ' ')
+
+check_targets() {
+  local repo="$1" dir="$WORKSPACE/$1"
+  echo ""
+  echo "=== $repo (make targets) ==="
+  if [[ ! -d "$dir" ]]; then echo "  [SKIP]  not checked out"; return; fi
+  if [[ ! -f "$dir/Makefile" ]]; then warn "Makefile missing"; return; fi
+  local db tgt
+  db=$(make -C "$dir" -qpRr 2>/dev/null </dev/null || true)
+  for tgt in $STD_TARGETS; do
+    if grep -qE "^${tgt}:" <<<"$db"; then ok "make $tgt"; else warn "make $tgt not defined"; fi
+  done
+  # Bare 'make' must do exactly what 'make help' does.
+  if [[ "$(make -C "$dir" -n 2>&1 </dev/null)" == "$(make -C "$dir" -n help 2>&1 </dev/null)" ]]; then
+    ok "default goal = help"
+  else
+    warn "default goal is not help (bare 'make' should print the target list)"
+  fi
+}
+
 echo "DV environment audit — workspace: $WORKSPACE"
 echo "Canonical versions: OSS CAD Suite=$OSS_CAD_SUITE_VERSION  cocotb=$COCOTB_PIP_SPEC"
 
@@ -97,6 +124,8 @@ check_repo "chi-to-bow-bridge"          no-sby        # has cocotb, no sby forma
 check_repo "axi4_to_dfi_ddr"            no-sby        # has cocotb, Yosys (not sby CI pin)
 check_repo "ucie-cxl-bridge"                          # has cocotb + sby
 check_repo "IP-ucie-rdi-to-pcie-pipe"   no-cocotb no-sby no-ci-rename
+
+for r in $RTL_REPOS; do check_targets "$r"; done
 
 echo ""
 if [[ $FAIL -eq 0 ]]; then
