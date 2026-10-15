@@ -44,8 +44,8 @@ coverage  — make coverage  (Verilator --coverage, artifact upload, needs: regr
 formal    — make formal     (SymbiYosys or Yosys, needs: regress, where .sby exists)
 ```
 
-All jobs run on `ubuntu-latest`. OSS CAD Suite is pinned by
-`OSS_CAD_SUITE_VERSION` env var for SymbiYosys repos.
+All jobs run on `ubuntu-latest` (or inside the repo's toolchain image, whose
+`Dockerfile` pins every tool version).
 
 ---
 
@@ -97,7 +97,7 @@ Current deviations (tracked in TODO below):
 ### Done (2026-05-09 alignment sweep)
 
 - [x] Create `dv_env.mk` at workspace root as canonical tool version pin source
-      (`OSS_CAD_SUITE_VERSION`, `COCOTB_PIP_SPEC`)
+      (`COCOTB_PIP_SPEC`)
 - [x] Create `dv_audit.sh` — checks all 5 repos for standard targets, CI file name,
       and version pin alignment. Run via `make audit` from workspace root.
 - [x] Add `make regress` to workspace root Makefile (iterates all 5 repos)

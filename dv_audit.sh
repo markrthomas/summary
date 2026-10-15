@@ -7,7 +7,6 @@ WORKSPACE="$(cd "$(dirname "$0")" && pwd)"
 FAIL=0
 
 # Canonical versions from dv_env.mk
-OSS_CAD_SUITE_VERSION=$(grep -m1 'OSS_CAD_SUITE_VERSION' "$WORKSPACE/dv_env.mk" | grep -oP '(?<=\?= ).*')
 COCOTB_PIP_SPEC=$(grep -m1 'COCOTB_PIP_SPEC' "$WORKSPACE/dv_env.mk" | grep -oP '(?<=\?= ).*')
 
 warn() { echo "  [WARN]  $*"; FAIL=1; }
@@ -71,28 +70,12 @@ check_repo() {
       fi
     fi
   fi
-
-  # 4. OSS CAD Suite version pin (only repos that use SymbiYosys)
-  if [[ ! " ${flags[*]} " =~ " no-sby " ]]; then
-    local ci_to_check="$ci_file"
-    if grep -qF "$OSS_CAD_SUITE_VERSION" "$ci_to_check" 2>/dev/null; then
-      ok "OSS_CAD_SUITE_VERSION: $OSS_CAD_SUITE_VERSION"
-    else
-      local actual
-      actual=$(grep -oP '(?<=OSS_CAD_SUITE_VERSION: ")[^"]+' "$ci_to_check" 2>/dev/null | head -1 || true)
-      if [[ -n "$actual" ]]; then
-        warn "OSS_CAD_SUITE_VERSION mismatch: found '$actual', want '$OSS_CAD_SUITE_VERSION'"
-      else
-        warn "OSS_CAD_SUITE_VERSION not pinned (want '$OSS_CAD_SUITE_VERSION')"
-      fi
-    fi
-  fi
 }
 
 echo "DV environment audit — workspace: $WORKSPACE"
-echo "Canonical versions: OSS CAD Suite=$OSS_CAD_SUITE_VERSION  cocotb=$COCOTB_PIP_SPEC"
+echo "Canonical versions: cocotb=$COCOTB_PIP_SPEC"
 
-check_repo "IP-axi-to-2apbs"            no-sby        # has cocotb; formal uses apt Yosys, not OSS CAD
+check_repo "IP-axi-to-2apbs"            no-sby        # has cocotb; formal uses apt Yosys
 check_repo "chi-to-bow-bridge"          no-sby        # has cocotb, no sby formal
 check_repo "axi4_to_dfi_ddr"            no-sby        # has cocotb, Yosys (not sby CI pin)
 check_repo "ucie-cxl-bridge"                          # has cocotb + sby
