@@ -1,7 +1,8 @@
 # DV Standards — RTL Workspace
 
 **Applies to:** `IP-axi-to-2apbs`, `IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`,
-`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`, `cxl_lpddr5x_bridge`
+`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`, `cxl_lpddr5x_bridge`,
+`pcie-on-ucie-3d`
 
 ---
 

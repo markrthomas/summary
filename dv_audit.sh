@@ -80,6 +80,7 @@ check_repo "chi-to-bow-bridge"          no-sby        # has cocotb, no sby forma
 check_repo "axi4_to_dfi_ddr"            no-sby        # has cocotb, Yosys (not sby CI pin)
 check_repo "ucie-cxl-bridge"                          # has cocotb + sby
 check_repo "IP-ucie-rdi-to-pcie-pipe"   no-cocotb no-sby no-ci-rename
+check_repo "pcie-on-ucie-3d"                          # has cocotb + sby; 5 DV envs, PCIe<->UCIe-3D adapter
 
 echo ""
 if [[ $FAIL -eq 0 ]]; then
