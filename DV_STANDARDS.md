@@ -28,6 +28,8 @@ rule database, so a directory that merely shares a name, e.g. `formal/`, does no
 | `make ci` | `regress` + `coverage` + `formal` — comprehensive local run | Always |
 | `make stress` | Stress / randomized simulation | Yes (or print `[STRESS] n/a` stub and exit 0) |
 | `make clean` | Remove all build artifacts | Always |
+| `make tools` *(recommended)* | Verify the toolchain + install missing light tiers (`TOOLS_HEAVY=1` builds the from-source Verilator) | Always |
+| `make tools-check` *(recommended)* | Verify the toolchain only — install nothing; non-zero exit iff a *core* tool is absent | Yes (iff core tools present) |
 
 Rules:
 
@@ -44,6 +46,30 @@ Rules:
   otherwise falls back to the license-free RTL smoke; `regress` is always license-free.
 - **Non-Make drivers.** `apb-to-mem-all-py` (pytest) and `apb-to-mem-bazel` (Bazel)
   expose the same verbs as thin shims over their native runner.
+- **`tools`/`tools-check` are recommended, not required (yet).** `make audit`
+  reports a missing one as `[INFO]`, never a `[WARN]` — so a repo that hasn't
+  vendored `tools/check_tools.sh` is not a deviation. They are additive and must
+  never be folded into `regress`/`ci` (they audit the environment, not the RTL).
+
+## Toolchain standard
+
+Canonical tool version pins live in **`dv_env.mk`** at the workspace root (the
+single source of truth `dv_audit.sh` and `tools/check_tools.sh` read). Each repo's
+`Dockerfile` remains the authoritative, buildable recipe; `dv_env.mk` is the shared
+baseline those are checked against.
+
+| Tool | Pin (`dv_env.mk`) | Notes |
+|------|-------------------|-------|
+| Verilator | `VERILATOR_VERSION` 5.050 (≥ `VERILATOR_MIN` 5.030) | **from source** for the UVM `--binary` flow; apt is too old. Never set `VERILATOR_ROOT` on the from-source repos. |
+| Icarus | `ICARUS_MIN` ≥ 12 | SV package syntax; Ubuntu 24.04 apt = 12, 22.04 = 11 (too old). |
+| Yosys + slang | `YOSYS_REF` | native `read_slang` (from source) or the oss-cad-suite slang plugin on repos not yet migrated. |
+| Formal solver | `YICES_VERSION` 2.6.5 | yices/btormc preferred (memory-light); apt z3 can OOM on deep covers. |
+| SystemC | `SYSTEMC_MIN` 2.3.3 | apt `libsystemc-dev`. |
+| cocotb | one of `COCOTB_ACCEPTED` (1.8.1 or 1.9.2) | workspace mid-migration; converge later. |
+| pyuvm / pyvsc | `PYUVM_PIP_SPEC` / `PYVSC_PIP_SPEC` | pip. |
+
+A repo adopts the standard by vendoring `tools/check_tools.sh` (driven by
+`dv_env.mk`) and exposing `make tools` / `make tools-check`.
 
 ### Implementation status (2026-10-13 — target-name sweep)
 

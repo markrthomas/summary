@@ -11,6 +11,7 @@ COCOTB_PIP_SPEC=$(grep -m1 'COCOTB_PIP_SPEC' "$WORKSPACE/dv_env.mk" | grep -oP '
 
 warn() { echo "  [WARN]  $*"; FAIL=1; }
 ok()   { echo "  [OK]    $*"; }
+info() { echo "  [INFO]  $*"; }   # advisory; never sets FAIL
 
 check_repo() {
   local repo="$1"; shift
@@ -77,6 +78,9 @@ check_repo() {
 # aliases and includes are seen as make sees them; a directory that merely shares
 # a target's name (e.g. formal/) does NOT count as the target.
 STD_TARGETS="help lint sim regress coverage formal ci stress clean"
+# Recommended-but-optional targets (toolchain audit, DV_STANDARDS.md "Toolchain
+# standard"). Missing ones are reported [INFO], never a WARN — they don't gate.
+OPT_TARGETS="tools tools-check"
 # Repo directory names as they appear in this workspace (same list as the root Makefile).
 RTL_REPOS=$(sed -n '/^RTL_REPOS :=/,/^$/p' "$WORKSPACE/Makefile" | sed 's/^RTL_REPOS ://; s/^=//; s/\\$//' | tr -s ' \n' ' ')
 
@@ -90,6 +94,9 @@ check_targets() {
   db=$(make -C "$dir" -qpRr 2>/dev/null </dev/null || true)
   for tgt in $STD_TARGETS; do
     if grep -qE "^${tgt}:" <<<"$db"; then ok "make $tgt"; else warn "make $tgt not defined"; fi
+  done
+  for tgt in $OPT_TARGETS; do
+    if grep -qE "^${tgt}:" <<<"$db"; then ok "make $tgt"; else info "make $tgt not defined (recommended: toolchain audit)"; fi
   done
   # Bare 'make' must do exactly what 'make help' does.
   if [[ "$(make -C "$dir" -n 2>&1 </dev/null)" == "$(make -C "$dir" -n help 2>&1 </dev/null)" ]]; then
