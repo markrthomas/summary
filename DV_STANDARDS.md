@@ -1,8 +1,13 @@
 # DV Standards — RTL Workspace
 
-**Applies to:** `IP-axi-to-2apbs`, `IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`,
-`chi-to-bow-bridge`, `ucie-cxl-bridge`, `tilelink_to_AXI4`, `cxl_lpddr5x_bridge`,
-`pcie-on-ucie-3d`
+**Applies to** (the bridge IP repos currently in this workspace): `axi-on-ucie-to-mem`,
+`eth-dj-pcie-pipe7_1-bridge`, `pcie-on-ucie-3d`, `ucie2-pipe7-bridge`.
+
+`dv_audit.sh` (`make audit`) **auto-discovers** these — every immediate subdirectory
+that is a git repo with a root `Makefile` is audited, so a newly cloned repo is
+covered without editing the script. (Earlier generations — `IP-axi-to-2apbs`,
+`IP-ucie-rdi-to-pcie-pipe`, `axi4_to_dfi_ddr`, `chi-to-bow-bridge`, `ucie-cxl-bridge`,
+`tilelink_to_AXI4`, `cxl_lpddr5x_bridge` — are no longer checked out here.)
 
 ---
 
@@ -19,21 +24,47 @@ Every RTL repo must expose these root-level targets with consistent semantics:
 | `make formal` | SymbiYosys BMC + cover on key modules | Yes (or print stub and exit 0) |
 | `make ci` | `regress` + `coverage` + `formal` — comprehensive local run | Always |
 | `make stress` | Stress / randomized simulation (if applicable) | Always |
+| `make tools` | Verify the toolchain and install what is missing (light tiers via apt+pip; heavy from-source builds opt-in via `TOOLS_HEAVY=1`, else reported) | Always |
+| `make tools-check` | Verify the toolchain only — install nothing; **non-zero exit iff a *core* tool is absent** (CI/dry-run safe) | Yes (iff core tools present) |
 | `make clean` | Remove all build artifacts | Always |
 
-### Implementation status (2026-05-31 — cxl_lpddr5x_bridge DV-standardized + coverage)
+### Implementation status (2026-10-28 — audit auto-discovery + `tools`/`tools-check` standard)
 
-| Repo | lint | sim | regress | coverage | formal | ci | CI workflow |
-|------|------|-----|---------|----------|--------|----|-------------|
-| IP-axi-to-2apbs | ✓ | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ | ✓ coverage job |
-| IP-ucie-rdi-to-pcie-pipe | ✓ | ✓ | ✓ | ✓ alias | ✓ (SymbiYosys) | ✓ existing | ✓ existing |
-| axi4_to_dfi_ddr | ✓ alias | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ existing | ✓ coverage job |
-| chi-to-bow-bridge | ✓ | ✓ | ✓ | ✓ alias | ✓ (SymbiYosys) | ✓ | ✓ existing |
-| ucie-cxl-bridge | ✓ | ✓ | ✓ | ✓ (Verilator C++) | ✓ (SymbiYosys) | ✓ | ✓ coverage job |
-| tilelink_to_AXI4 | ✓ | ✓ (Verilator C++ + cocotb Icarus) | ✓ | ✓ (Verilator C++, 97.1%) | ✓ (SymbiYosys) | ✓ | ✗ |
-| cxl_lpddr5x_bridge | ✓ | ✓ (Icarus + cocotb Icarus) | ✓ | ✓ (Verilator C++, 96.9%) | ✓ (SymbiYosys, 6/6) | ✓ | ✓ regress/coverage/cocotb/formal |
+Run `make audit` for the live per-repo result; the audit now also checks for
+`CLAUDE.md`, `tools`/`tools-check`, and an accepted cocotb pin.
+
+| Repo | lint/sim/regress | coverage | formal | tools/-check | CLAUDE.md | cocotb |
+|------|------------------|----------|--------|--------------|-----------|--------|
+| axi-on-ucie-to-mem | ✓ | ✓ (Verilator C++, floor 85%) | ✓ (Yosys slang + btormc) | — (add) | ✓ | 1.9.2 |
+| eth-dj-pcie-pipe7_1-bridge | ✓ | ✓ (Verilator C++, floor 80%) | ✓ (SymbiYosys + yices) | — (add) | ✓ (on `main`) | 1.8.1 |
+| pcie-on-ucie-3d | ✓ | ✓ (Verilator C++, floor 99%) | ✓ (SymbiYosys + yices) | — (add) | ✓ | 1.8.1 |
+| ucie2-pipe7-bridge | ✓ | ✓ (advisory line cov) | ✓ (SymbiYosys bounded) | ✓ | ✓ | 1.9.2 |
 
 ---
+
+## Toolchain standard
+
+The canonical tool version pins live in **`dv_env.mk`** at the workspace root (the
+single source of truth the audit reads). Each repo's `Dockerfile` remains the
+authoritative, buildable recipe; `dv_env.mk` is the shared baseline those are
+checked against.
+
+| Tool | Pin (`dv_env.mk`) | Notes |
+|------|-------------------|-------|
+| Verilator | `VERILATOR_VERSION` 5.050 (≥ `VERILATOR_MIN` 5.030) | **from source** for the UVM `--binary` flow; apt is too old. **Never set `VERILATOR_ROOT`.** |
+| Icarus | `ICARUS_MIN` ≥ 12 | SV package syntax; Ubuntu 24.04 apt = 12, 22.04 apt = 11 (too old). |
+| Yosys + slang | `YOSYS_REF` | native `read_slang` frontend, from source; for `make formal`. |
+| SymbiYosys (sby) | — | from source; `make formal`. |
+| Formal solver | `YICES_VERSION` 2.6.5 | yices preferred (memory-light); apt z3 can OOM on deep covers. |
+| SystemC | `SYSTEMC_MIN` 2.3.3 | apt `libsystemc-dev`. |
+| cocotb | one of `COCOTB_ACCEPTED` (1.8.1 or 1.9.2) | workspace mid-migration; converge later. |
+| pyuvm / pyvsc | `PYUVM_PIP_SPEC` / `PYVSC_PIP_SPEC` | pip. |
+
+Every repo exposes **`make tools`** (verify + install missing; heavy from-source
+builds opt-in via `TOOLS_HEAVY=1`) and **`make tools-check`** (verify only; non-zero
+exit iff a *core* tool is absent — safe as a CI/audit gate), backed by a vendored
+`tools/check_tools.sh` driven by `dv_env.mk`. `make tools-check` is additive and is
+**not** wired into `regress`/`ci` (it audits the environment, it doesn't gate RTL).
 
 ## Standard CI layout
 
