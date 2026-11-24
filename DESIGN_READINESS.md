@@ -133,7 +133,7 @@ Legend: ✅ passed (artifact) · ◑ authored-not-run (T-pending) · ◐ partial
 |------|:---:|:---:|:---:|:---:|:---:|
 | DV gate (entry) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **T0** spec freeze | ◐ (Phase J to real encodings; **private**) | ◐ (DFI single-phase; JEDEC subset) | ◐ (TLCToCHI 1/7) | ✅ (public, frozen) | ◐ ("LPDDR5X-style", not real PHY) |
-| **T1** synth | ✅ `make synth` 22629 cells/0 latch (slang) | ✅ `make synth` 13090 cells/0 latch + ✅ `make cdc` | ✅ `make syn` (gen-SV, 3 tops) | ✅ `make syn` (latch-free) | ✅ `make synth` + ✅ `make cdc` |
+| **T1** synth | ✅ `make synth` 22629 cells/0 latch (slang) + ✅ multiclock formal CDC (`make formal`, CI) | ✅ `make synth` 13090 cells/0 latch + ✅ `make cdc` | ✅ `make syn` (gen-SV, 3 tops) | ✅ `make syn` (latch-free) | ✅ `make synth` + ✅ `make cdc` |
 | **T2** STA | ◑ SDC+STA (needs-pdk) | ◑ SDC+STA | ◑ SDC+STA | ◑ SDC+STA | ◑ SDC+STA |
 | **T3** low-power | ◑ authored UPF + P0→P2 test | ◐ UPF + OSS lint (`make lp`) | ◐ single-domain UPF + lint (`make lp`) | ◐ UPF + OSS lint (`make lp`) | ◐ UPF + OSS lint (`make lp`) |
 | **T4** DFT | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) |
@@ -145,7 +145,8 @@ Legend: ✅ passed (artifact) · ◑ authored-not-run (T-pending) · ◐ partial
 
 The headline (updated 2026-11-24): **T1 now has a runnable OSS synth gate passing on all
 five** (`make synth`/`make syn`, latch-free + cell/depth artifacts, in CI; structural
-`make cdc` on the multi-clock #1/#4), and **T2 SDC + STA drivers are authored on all five**
+`make cdc` on the multi-clock #1/#4, and a multiclock **formal** CDC proof — on the real
+elastic buffer, independent wr/rd clocks — now CI-gated on #5), and **T2 SDC + STA drivers are authored on all five**
 (run is `needs-pdk`). #5's earlier "not a valid top-level module" turned out to be a
 gate quoting bug (a newline-separated `$(ls …)` file list split the yosys `-p` script),
 not an RTL or slang-version problem; fixed, and the full top synthesizes (22629 cells,
