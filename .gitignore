@@ -8,6 +8,7 @@
 !.pandoc-pdf-defaults.yaml
 !.report-title.md
 !DV_STANDARDS.md
+!DESIGN_READINESS.md
 !dv_env.mk
 !dv_audit.sh
 !update_readme.py
