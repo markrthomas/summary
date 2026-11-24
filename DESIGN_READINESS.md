@@ -133,8 +133,8 @@ Legend: ✅ passed (artifact) · ◑ authored-not-run (T-pending) · ◐ partial
 |------|:---:|:---:|:---:|:---:|:---:|
 | DV gate (entry) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **T0** spec freeze | ◐ (Phase J to real encodings; **private**) | ◐ (DFI single-phase; JEDEC subset) | ◐ (TLCToCHI 1/7) | ✅ (public, frozen) | ◐ ("LPDDR5X-style", not real PHY) |
-| **T1** synth | ☐ (Yosys sanity only) | ◐ (Yosys synth sanity) | ☐ (gen-SV only) | ☐ | ☐ |
-| **T2** STA | ☐ | ☐ | ☐ | ☐ | ☐ |
+| **T1** synth | ☐ **OPEN** (slang: top not elaborable — finding) | ✅ `make synth` 13090 cells/0 latch + ✅ `make cdc` | ✅ `make syn` (gen-SV, 3 tops) | ✅ `make syn` (latch-free) | ✅ `make synth` + ✅ `make cdc` |
+| **T2** STA | ◑ SDC+STA (needs-pdk) | ◑ SDC+STA | ◑ SDC+STA | ◑ SDC+STA | ◑ SDC+STA |
 | **T3** low-power | ◑ authored UPF | ☐ | ☐ | ☐ | ☐ |
 | **T4** DFT | ☐ | ☐ | ☐ | ☐ | ☐ |
 | **T5** verif sign-off | ◑ UVM/VCS authored; 98.3% line + 100% fcov on OSS | ◐ directed+FIFO BMC | ◐ 95.1% + formal | ◑ UVM-on-Vl green; 100% line; formal S+L | ◑ 100% line; unbounded formal prove; UVM authored |
@@ -143,9 +143,14 @@ Legend: ✅ passed (artifact) · ◑ authored-not-run (T-pending) · ◐ partial
 
 (◑ = authored-not-run; ◐ = partial/in-progress; ◑ and ◐ both read as **T-pending**.)
 
-The headline: **T0 and T5 are furthest along** (DV is strong across the board); **T1, T2,
-T4, T6, T7 are green-field for all five** and are the bulk of the remaining work. #1 also
-carries real **RTL-completion** debt before it can enter T1 at all.
+The headline (updated 2026-11-24): **T1 now has a runnable OSS synth gate on four of
+five** (`make synth`/`make syn`, latch-free + cell/depth artifacts; structural `make cdc`
+on the multi-clock #1/#4), and **T2 SDC + STA drivers are authored on all five** (run is
+`needs-pdk`). **#5's T1 is the one open finding** — the full top does not elaborate under
+yosys-slang (`ucie_rdi_to_pipe7_mac_bridge` rejected as top; Verilator-verified); tracked
+OPEN in its `syn/SIGNOFF.md`, no faked CI gate. **T0 and T5 remain furthest along** (DV is
+strong across the board); **T4, T6, T7 are still green-field for all five** (needs-license
+/ needs-pdk). #1 also carries real **RTL-completion** debt behind its passing synth sanity.
 
 ---
 
