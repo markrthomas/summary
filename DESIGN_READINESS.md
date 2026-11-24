@@ -135,8 +135,8 @@ Legend: ✅ passed (artifact) · ◑ authored-not-run (T-pending) · ◐ partial
 | **T0** spec freeze | ◐ (Phase J to real encodings; **private**) | ◐ (DFI single-phase; JEDEC subset) | ◐ (TLCToCHI 1/7) | ✅ (public, frozen) | ◐ ("LPDDR5X-style", not real PHY) |
 | **T1** synth | ✅ `make synth` 22629 cells/0 latch (slang) | ✅ `make synth` 13090 cells/0 latch + ✅ `make cdc` | ✅ `make syn` (gen-SV, 3 tops) | ✅ `make syn` (latch-free) | ✅ `make synth` + ✅ `make cdc` |
 | **T2** STA | ◑ SDC+STA (needs-pdk) | ◑ SDC+STA | ◑ SDC+STA | ◑ SDC+STA | ◑ SDC+STA |
-| **T3** low-power | ◑ authored UPF | ☐ | ☐ | ☐ | ☐ |
-| **T4** DFT | ☐ | ☐ | ☐ | ☐ | ☐ |
+| **T3** low-power | ◑ authored UPF | ☐ | ☐ | ◐ UPF + OSS lint (`make lp`) | ☐ |
+| **T4** DFT | ☐ | ☐ | ☐ | ◐ scan-ready (`make dft`) | ☐ |
 | **T5** verif sign-off | ◑ UVM/VCS authored; 98.3% line + 100% fcov on OSS | ◐ directed+FIFO BMC | ◐ 95.1% + formal | ◑ UVM-on-Vl green; 100% line; formal S+L | ◑ 100% line; unbounded formal prove; UVM authored |
 | **T6** GLS + PPA | ☐ | ☐ | ☐ | ☐ | ☐ |
 | **T7** integration/pkg | ☐ | ☐ | ☐ | ☐ | ☐ |
@@ -149,9 +149,12 @@ five** (`make synth`/`make syn`, latch-free + cell/depth artifacts, in CI; struc
 (run is `needs-pdk`). #5's earlier "not a valid top-level module" turned out to be a
 gate quoting bug (a newline-separated `$(ls …)` file list split the yosys `-p` script),
 not an RTL or slang-version problem; fixed, and the full top synthesizes (22629 cells,
-latch-free). **T0 and T5 remain furthest along** (DV is strong across the board); **T4,
-T6, T7 are still green-field for all five** (needs-license / needs-pdk). #1 also carries
-real **RTL-completion** debt behind its passing synth sanity.
+latch-free). **T3/T4 are now pathfound on #3** (`make lp` UPF-consistency lint + `make dft`
+scan-readiness audit, both OSS and in CI; the `-upf` sim, scan insertion and ATPG stay
+needs-license) and promoted to the kit as templates — rollout to #1/#2/#4 and #5's DFT is
+next; #5 already has authored UPF. **T0 and T5 remain furthest along** (DV is strong
+across the board); **T6, T7 are still green-field for all five** (needs-license /
+needs-pdk). #1 also carries real **RTL-completion** debt behind its passing synth sanity.
 
 ---
 
