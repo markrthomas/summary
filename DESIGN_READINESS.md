@@ -138,8 +138,8 @@ Legend: ✅ passed (artifact) · ◑ authored-not-run (T-pending) · ◐ partial
 | **T3** low-power | ◑ authored UPF + P0→P2 test | ◐ UPF + OSS lint (`make lp`) | ◐ single-domain UPF + lint (`make lp`) | ◐ UPF + OSS lint (`make lp`) | ◐ UPF + OSS lint (`make lp`) |
 | **T4** DFT | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) | ◐ scan-ready (`make dft`) |
 | **T5** verif sign-off | ◑ UVM/VCS authored; 98.3% line + 100% fcov on OSS | ◐ directed+FIFO BMC | ◐ 95.1% + formal | ◑ UVM-on-Vl green; 100% line; formal S+L | ◑ 100% line; unbounded formal prove; UVM authored |
-| **T6** GLS + PPA | ☐ | ☐ | ☐ | ☐ | ☐ |
-| **T7** integration/pkg | ☐ | ☐ | ☐ | ☐ | ☐ |
+| **T6** GLS + PPA | ☐ | ☐ | ☐ | ◐ `make gls`+`make ppa` (pathfind) | ☐ |
+| **T7** integration/pkg | ☐ | ☐ | ☐ | ◐ IP-XACT+guide, `make pkg` (pathfind) | ☐ |
 
 (◑ = authored-not-run; ◐ = partial/in-progress; ◑ and ◐ both read as **T-pending**.)
 
@@ -158,9 +158,16 @@ with per-block flop/reset/async/RAM inventories — #5 6766 flops via slang, #1 
 #1 (DDR self-refresh), #3 and #4 (LPDDR5X low-power), a single-always-on-domain contract on
 the #2 protocol bridge (no gating partition — honest n/a rather than a fabricated domain),
 and #5 carries the richest T3 (authored UPF + P0→P2→P0 power-aware test). The flow halves
-live in the kit as templates. **T0 and T5 remain furthest along** (DV is strong
-across the board); **T6, T7 are still green-field for all five** (needs-license /
-needs-pdk). #1 also carries real **RTL-completion** debt behind its passing synth sanity.
+live in the kit as templates. **T6 and T7 are now pathfound on #3** (the flow pathfinder):
+**T6** = `make gls` zero-delay gate-level sim (the synthesized netlist runs the block's own
+self-checking TBs clean, via Yosys simcells/simlib) + `make ppa` technology-independent PPA
+proxy (cells/flops/logic-depth); **T7** = IP-XACT (IEEE 1685-2014) components for both tops
++ integration guide, gated by `make pkg` (well-formed + structural + a hard IP-XACT↔RTL
+port-sync check), all OSS and in CI. Their needs-pdk / needs-license layers stay tagged
+(SDF-timing GLS, Liberty-mapped synth, real STA/area/power, formal RTL↔netlist LEC). Next:
+promote the T6/T7 templates to the kit and roll onto #1/#2/#4/#5. **T0 and T5 remain
+furthest along** otherwise (DV is strong across the board). #1 also carries real
+**RTL-completion** debt behind its passing synth sanity.
 
 ---
 
